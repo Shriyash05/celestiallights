@@ -23,7 +23,7 @@ const HeroSection = () => {
         <div className="text-left">
           <div className="mb-6">
             <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-              24+ Years of Excellence
+              join us
             </span>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
               Make Your

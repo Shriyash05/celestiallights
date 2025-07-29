@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Factory, Cog, Zap, Target, User } from "lucide-react";
 import manufacturingImage from "@/assets/manufacturing.jpg";
-import directorPhoto from "@/assets/director-photo.jpg";
+import directorPhoto from "@/assets/director-photo.jpeg";
 
 const AboutSection = () => {
   const values = [
@@ -104,8 +104,8 @@ const AboutSection = () => {
                         <User className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <h4 className="text-2xl font-bold">Director</h4>
-                        <p className="text-muted-foreground">Celestial Lights</p>
+                        <h4 className="text-2xl font-bold">Atharv Chaudhari</h4>
+                        <p className="text-muted-foreground">Director</p>
                       </div>
                     </div>
                     
