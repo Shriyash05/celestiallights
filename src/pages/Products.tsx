@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
+import ProductDetailModal from '@/components/ProductDetailModal';
 
 interface Product {
   id: string;
@@ -14,6 +15,7 @@ interface Product {
   description: string;
   technical_specifications: string[];
   image_url?: string;
+  images?: string[];
   is_published: boolean;
   is_featured: boolean;
 }
@@ -23,6 +25,8 @@ const Products = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -148,7 +152,14 @@ const Products = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {filteredProducts.map((product) => (
-              <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300">
+              <Card 
+                key={product.id} 
+                className="group overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
+                onClick={() => {
+                  setSelectedProduct(product);
+                  setIsModalOpen(true);
+                }}
+              >
                 <div className="relative overflow-hidden">
                   <img
                     src={getProductImage(product)}
@@ -216,6 +227,12 @@ const Products = () => {
           </Button>
         </div>
       </div>
+      
+      <ProductDetailModal 
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 };

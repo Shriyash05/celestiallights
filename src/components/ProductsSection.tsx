@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import ProductDetailModal from './ProductDetailModal';
 
 interface Product {
   id: string;
@@ -13,12 +14,16 @@ interface Product {
   description: string;
   technical_specifications: string[];
   image_url?: string;
+  images?: string[];
+  is_published: boolean;
   is_featured: boolean;
 }
 
 const ProductsSection = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchFeaturedProducts();
@@ -44,6 +49,11 @@ const ProductsSection = () => {
   };
 
   const getProductImage = (product: Product) => {
+    // Use first image from images array if available
+    if (product.images && product.images.length > 0) {
+      return product.images[0];
+    }
+    // Fallback to image_url
     if (product.image_url) return product.image_url;
     
     // Fallback images based on category
@@ -57,6 +67,16 @@ const ProductsSection = () => {
     
     return fallbackImages[product.category as keyof typeof fallbackImages] || 
            'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop';
+  };
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedProduct(null);
   };
 
   if (loading) {
@@ -110,7 +130,11 @@ const ProductsSection = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
               {products.map((product) => (
-                <Card key={product.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300 bg-card">
+                <Card 
+                  key={product.id} 
+                  className="group overflow-hidden hover:shadow-lg transition-all duration-300 bg-card cursor-pointer"
+                  onClick={() => handleProductClick(product)}
+                >
                   <div className="relative overflow-hidden">
                     <img
                       src={getProductImage(product)}
@@ -158,9 +182,10 @@ const ProductsSection = () => {
                       )}
                     </div>
 
-                    <Button className="w-full" variant="outline">
-                      Learn More
-                    </Button>
+                    <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                      <span className="text-sm text-muted-foreground">Click to view details</span>
+                      <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -177,6 +202,12 @@ const ProductsSection = () => {
           </>
         )}
       </div>
+      
+      <ProductDetailModal 
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </section>
   );
 };

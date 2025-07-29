@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import residentialImage from "@/assets/residential-lighting.jpg";
 import commercialImage from "@/assets/commercial-project.jpg";
+import ProjectDetailModal from "./ProjectDetailModal";
 
 interface Project {
   id: string;
@@ -16,6 +17,7 @@ interface Project {
   features: string[];
   location: string;
   image_url?: string;
+  images?: string[];
   is_published: boolean;
   is_featured: boolean;
 }
@@ -25,6 +27,8 @@ const PortfolioSection = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProjects();
@@ -36,13 +40,14 @@ const PortfolioSection = () => {
         .from('portfolio_projects')
         .select('*')
         .eq('is_published', true)
+        .eq('is_featured', true)
         .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching projects:', error);
       } else {
         setProjects(data || []);
-        setFeaturedProjects((data || []).filter(project => project.is_featured));
+        setFeaturedProjects(data || []); // Only featured projects now
       }
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -53,10 +58,26 @@ const PortfolioSection = () => {
 
   // Fallback images
   const getProjectImage = (project: Project) => {
+    // Use first image from images array if available
+    if (project.images && project.images.length > 0) {
+      return project.images[0];
+    }
+    // Fallback to image_url
     if (project.image_url) return project.image_url;
+    // Final fallback to default images
     return project.category === 'residential' || project.category === 'hospitality' 
       ? residentialImage 
       : commercialImage;
+  };
+
+  const handleProjectClick = (project: Project) => {
+    setSelectedProject(project);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedProject(null);
   };
 
   const filters = [
@@ -96,7 +117,11 @@ const PortfolioSection = () => {
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               {featuredProjects.map((project) => (
-                <Card key={`featured-${project.id}`} className="overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-background to-primary/5 hover:shadow-elegant transition-all duration-300 group">
+                <Card 
+                  key={`featured-${project.id}`} 
+                  className="overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-background to-primary/5 hover:shadow-elegant transition-all duration-300 group cursor-pointer"
+                  onClick={() => handleProjectClick(project)}
+                >
                   <div className="relative overflow-hidden">
                     <img 
                       src={getProjectImage(project)} 
@@ -129,14 +154,19 @@ const PortfolioSection = () => {
                       </Badge>
                     </div>
                     
-                    <p className="text-muted-foreground mb-4">{project.description}</p>
+                    <p className="text-muted-foreground mb-4 line-clamp-2">{project.description}</p>
                     
                     <div className="flex flex-wrap gap-2">
-                      {project.features.map((feature, idx) => (
+                      {project.features.slice(0, 3).map((feature, idx) => (
                         <Badge key={idx} variant="outline" className="text-xs">
                           {feature}
                         </Badge>
                       ))}
+                      {project.features.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{project.features.length - 3} more
+                        </Badge>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -180,7 +210,11 @@ const PortfolioSection = () => {
             ))
           ) : filteredProjects.length > 0 ? (
             filteredProjects.map((project) => (
-              <Card key={project.id} className="overflow-hidden border-0 bg-background hover:shadow-elegant transition-all duration-300 group">
+              <Card 
+                key={project.id} 
+                className="overflow-hidden border-0 bg-background hover:shadow-elegant transition-all duration-300 group cursor-pointer"
+                onClick={() => handleProjectClick(project)}
+              >
                 <div className="relative overflow-hidden">
                   <img 
                     src={getProjectImage(project)} 
@@ -208,14 +242,19 @@ const PortfolioSection = () => {
                     </Badge>
                   </div>
                   
-                  <p className="text-muted-foreground mb-4">{project.description}</p>
+                  <p className="text-muted-foreground mb-4 line-clamp-2">{project.description}</p>
                   
                   <div className="flex flex-wrap gap-2">
-                    {project.features.map((feature, idx) => (
+                    {project.features.slice(0, 3).map((feature, idx) => (
                       <Badge key={idx} variant="outline" className="text-xs">
                         {feature}
                       </Badge>
                     ))}
+                    {project.features.length > 3 && (
+                      <Badge variant="outline" className="text-xs">
+                        +{project.features.length - 3} more
+                      </Badge>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -248,6 +287,12 @@ const PortfolioSection = () => {
           </div>
         </div>
       </div>
+      
+      <ProjectDetailModal 
+        project={selectedProject}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </section>
   );
 };

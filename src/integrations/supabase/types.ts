@@ -22,6 +22,7 @@ export type Database = {
           features: string[]
           id: string
           image_url: string | null
+          images: string[] | null
           is_featured: boolean | null
           is_published: boolean | null
           location: string
@@ -35,6 +36,7 @@ export type Database = {
           features?: string[]
           id?: string
           image_url?: string | null
+          images?: string[] | null
           is_featured?: boolean | null
           is_published?: boolean | null
           location: string
@@ -48,6 +50,7 @@ export type Database = {
           features?: string[]
           id?: string
           image_url?: string | null
+          images?: string[] | null
           is_featured?: boolean | null
           is_published?: boolean | null
           location?: string
@@ -63,6 +66,7 @@ export type Database = {
           description: string
           id: string
           image_url: string | null
+          images: string[] | null
           is_featured: boolean | null
           is_published: boolean | null
           technical_specifications: string[]
@@ -75,6 +79,7 @@ export type Database = {
           description: string
           id?: string
           image_url?: string | null
+          images?: string[] | null
           is_featured?: boolean | null
           is_published?: boolean | null
           technical_specifications?: string[]
@@ -87,6 +92,7 @@ export type Database = {
           description?: string
           id?: string
           image_url?: string | null
+          images?: string[] | null
           is_featured?: boolean | null
           is_published?: boolean | null
           technical_specifications?: string[]
