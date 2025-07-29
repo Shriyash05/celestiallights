@@ -23,7 +23,7 @@ const HeroSection = () => {
         <div className="text-left">
           <div className="mb-6">
             <span className="inline-block px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
-              24+ Years of Excellence
+              Join Us
             </span>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
               Make Your
@@ -73,7 +73,7 @@ const HeroSection = () => {
                 <Users className="h-6 w-6 text-primary" />
               </div>
               <Counter 
-                end={500} 
+                end={100} 
                 suffix="+" 
                 className="text-2xl font-bold text-primary"
                 duration={3000}

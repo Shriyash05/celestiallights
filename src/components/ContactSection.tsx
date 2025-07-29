@@ -45,19 +45,19 @@ const ContactSection = () => {
     {
       icon: Phone,
       title: "Phone",
-      details: ["+91 89764 53765", "+91 22 XXXX XXXX"],
+      details: ["+91 89764 53765"],
       subtitle: "Call us for immediate assistance"
     },
     {
       icon: Mail,
       title: "Email",
-      details: ["info@celestiallights.com", "projects@celestiallights.com"],
+      details: ["info@celestiallights.com"],
       subtitle: "Send us your requirements"
     },
     {
       icon: MapPin,
       title: "Location",
-      details: ["Siddhivinayak Engineering", "Industrial Area, Mumbai"],
+      details: ["Siddhivinayak Engineering", "Par-R-410,TTC Industries Area","MIDC Industrial Area, Rabale, Navi Mumbai, Maharashtra 400701"],
       subtitle: "Visit our facility"
     },
     {
@@ -117,10 +117,6 @@ const ContactSection = () => {
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Response Time</span>
                     <span className="text-sm font-medium">&lt; 24 hours</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Free Consultation</span>
-                    <span className="text-sm font-medium">Always</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Project Timeline</span>

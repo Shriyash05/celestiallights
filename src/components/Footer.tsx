@@ -116,7 +116,7 @@ const Footer = () => {
         <div className="py-8 flex flex-col md:flex-row justify-between items-center">
           <div className="text-center md:text-left mb-4 md:mb-0">
             <p className="text-sm text-muted-foreground">
-              © 2024 Celestial Lights. A subsidiary of Siddhivinayak Engineering. All rights reserved.
+              © Celestial Lights. A subsidiary of Siddhivinayak Engineering. All rights reserved.
             </p>
           </div>
           <div className="flex items-center space-x-6">
