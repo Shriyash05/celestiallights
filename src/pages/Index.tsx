@@ -7,6 +7,7 @@ import PortfolioSection from "@/components/PortfolioSection";
 import TechnologySection from "@/components/TechnologySection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
   return (
@@ -20,6 +21,7 @@ const Index = () => {
       <TechnologySection />
       <ContactSection />
       <Footer />
+      <Toaster />
     </div>
   );
 };

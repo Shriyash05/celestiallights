@@ -12,3 +12,8 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://celestial-lights.lovable.app/sitemap.xml
+
+# Celestial Lights - Premium LED & Architectural Lighting Solutions
+# 24+ Years of Engineering Excellence

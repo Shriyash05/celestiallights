@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, FileText } from "lucide-react";
+import { Mail, FileText, Loader2, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface QuoteModalProps {
   trigger: React.ReactNode;
@@ -14,6 +15,7 @@ interface QuoteModalProps {
 }
 
 const QuoteModal = ({ trigger, type }: QuoteModalProps) => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,11 +29,24 @@ const QuoteModal = ({ trigger, type }: QuoteModalProps) => {
   });
 
   const [open, setOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    const subject = type === "quote" ? "Quote Request - Celestial Lights" : "Consultation Request - Celestial Lights";
+  const handleSubmit = async () => {
+    if (!formData.name || !formData.email || !formData.projectType || !formData.description) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     
-    const emailBody = `
+    try {
+      const subject = type === "quote" ? "Quote Request - Celestial Lights" : "Consultation Request - Celestial Lights";
+      
+      const emailBody = `
 Dear Celestial Lights Team,
 
 I am interested in your lighting solutions and would like to request a ${type}.
@@ -54,25 +69,43 @@ Thank you for your time. I look forward to hearing from you soon.
 
 Best regards,
 ${formData.name}
-    `.trim();
+      `.trim();
 
-    const mailtoLink = `mailto:info.celestiallight@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-    
-    window.open(mailtoLink, '_blank');
-    setOpen(false);
-    
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      projectType: "",
-      location: "",
-      budget: "",
-      timeline: "",
-      description: "",
-      needsPdf: false,
-    });
+      const mailtoLink = `mailto:info.celestiallight@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+      
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      window.open(mailtoLink, '_blank');
+      
+      toast({
+        title: "Email Client Opened",
+        description: "Your email client has been opened with pre-filled information. Please send the email to complete your request.",
+      });
+      
+      setOpen(false);
+      
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        projectType: "",
+        location: "",
+        budget: "",
+        timeline: "",
+        description: "",
+        needsPdf: false,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -213,15 +246,26 @@ ${formData.name}
             variant="outline" 
             onClick={() => setOpen(false)}
             className="flex-1"
+            disabled={isSubmitting}
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSubmit}
-            disabled={!formData.name || !formData.email || !formData.projectType || !formData.description}
+            disabled={!formData.name || !formData.email || !formData.projectType || !formData.description || isSubmitting}
             className="flex-1"
           >
-            Open Email Client
+            {isSubmitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing...
+              </>
+            ) : (
+              <>
+                <Mail className="mr-2 h-4 w-4" />
+                Open Email Client
+              </>
+            )}
           </Button>
         </div>
         

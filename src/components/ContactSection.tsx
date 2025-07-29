@@ -45,7 +45,7 @@ const ContactSection = () => {
     {
       icon: Phone,
       title: "Phone",
-      details: ["+91 XXX XXX XXXX", "+91 XXX XXX XXXX"],
+      details: ["+91 89764 53765", "+91 22 XXXX XXXX"],
       subtitle: "Call us for immediate assistance"
     },
     {

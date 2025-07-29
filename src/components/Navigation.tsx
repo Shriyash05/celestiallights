@@ -61,7 +61,7 @@ const Navigation = () => {
           <div className="hidden lg:flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <Phone className="h-4 w-4" />
-              <span>+91 XXX XXX XXXX</span>
+              <span>+91 89764 53765</span>
             </div>
             {user && isAdmin && (
               <div className="flex items-center space-x-2">
