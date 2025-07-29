@@ -97,6 +97,7 @@ const Admin = () => {
     certifications: '',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imageFiles, setImageFiles] = useState<FileList | null>(null);
   const [uploading, setUploading] = useState(false);
 
   // All hooks must be called before any early returns
@@ -153,8 +154,6 @@ const Admin = () => {
 
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
-      setUploading(true);
-      
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       
@@ -183,9 +182,13 @@ const Admin = () => {
         variant: "destructive",
       });
       return null;
-    } finally {
-      setUploading(false);
     }
+  };
+
+  const uploadMultipleImages = async (files: FileList): Promise<string[]> => {
+    const uploadPromises = Array.from(files).map(file => uploadImage(file));
+    const results = await Promise.all(uploadPromises);
+    return results.filter((url): url is string => url !== null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -193,21 +196,24 @@ const Admin = () => {
     setUploading(true);
     
     let finalImageUrl = formData.image_url;
+    let finalImages: string[] = [];
     
-    // If there's a file to upload, upload it first
+    // Handle single file upload (legacy)
     if (imageFile) {
       const uploadedUrl = await uploadImage(imageFile);
       if (uploadedUrl) {
         finalImageUrl = uploadedUrl;
+        finalImages = [uploadedUrl];
       } else {
         setUploading(false);
-        return; // Stop if upload failed
+        return;
       }
     }
     
     const projectData = {
       ...formData,
       image_url: finalImageUrl,
+      images: finalImages,
       features: formData.features.split(',').map(f => f.trim()).filter(f => f),
     };
 
@@ -317,11 +323,25 @@ const Admin = () => {
     setUploading(true);
     
     let finalImageUrl = productFormData.image_url;
+    let finalImages: string[] = [];
     
-    if (imageFile) {
+    // Handle multiple file uploads
+    if (imageFiles && imageFiles.length > 0) {
+      const uploadedUrls = await uploadMultipleImages(imageFiles);
+      if (uploadedUrls.length > 0) {
+        finalImages = uploadedUrls;
+        finalImageUrl = uploadedUrls[0]; // Set first image as main image for legacy support
+      } else {
+        setUploading(false);
+        return;
+      }
+    }
+    // Handle single file upload (legacy)
+    else if (imageFile) {
       const uploadedUrl = await uploadImage(imageFile);
       if (uploadedUrl) {
         finalImageUrl = uploadedUrl;
+        finalImages = [uploadedUrl];
       } else {
         setUploading(false);
         return;
@@ -334,6 +354,7 @@ const Admin = () => {
       description: productFormData.description,
       technical_specifications: productFormData.technical_specifications.split(',').map(spec => spec.trim()).filter(spec => spec),
       image_url: finalImageUrl,
+      images: finalImages,
       is_published: productFormData.is_published,
       is_featured: productFormData.is_featured,
       dimensions: {
@@ -487,6 +508,7 @@ const Admin = () => {
       is_featured: false,
     });
     setImageFile(null);
+    setImageFiles(null);
     setEditingProject(null);
     setShowForm(false);
   };
@@ -521,6 +543,7 @@ const Admin = () => {
       certifications: '',
     });
     setImageFile(null);
+    setImageFiles(null);
     setEditingProduct(null);
     setShowForm(false);
   };
@@ -973,7 +996,45 @@ const Admin = () => {
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="product-image-file">Upload Image from Device</Label>
+                    <Label htmlFor="product-images-multiple">Upload Multiple Images from Device</Label>
+                    <Input
+                      id="product-images-multiple"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        setImageFiles(files);
+                        if (files && files.length > 0) {
+                          setProductFormData({ ...productFormData, image_url: '' });
+                          setImageFile(null);
+                        }
+                      }}
+                    />
+                    {imageFiles && imageFiles.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">
+                          Selected {imageFiles.length} image{imageFiles.length > 1 ? 's' : ''}:
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {Array.from(imageFiles).map((file, index) => (
+                            <div key={index} className="text-xs bg-muted px-2 py-1 rounded">
+                              {file.name}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="h-px bg-border flex-1" />
+                    <span className="text-xs text-muted-foreground px-2">OR SINGLE IMAGE</span>
+                    <div className="h-px bg-border flex-1" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="product-image-file">Upload Single Image from Device</Label>
                     <Input
                       id="product-image-file"
                       type="file"
@@ -983,8 +1044,10 @@ const Admin = () => {
                         setImageFile(file || null);
                         if (file) {
                           setProductFormData({ ...productFormData, image_url: '' });
+                          setImageFiles(null);
                         }
                       }}
+                      disabled={!!(imageFiles && imageFiles.length > 0)}
                     />
                     {imageFile && (
                       <p className="text-sm text-muted-foreground">
@@ -995,7 +1058,7 @@ const Admin = () => {
                   
                   <div className="flex items-center gap-2">
                     <div className="h-px bg-border flex-1" />
-                    <span className="text-xs text-muted-foreground px-2">OR</span>
+                    <span className="text-xs text-muted-foreground px-2">OR URL</span>
                     <div className="h-px bg-border flex-1" />
                   </div>
                   
@@ -1008,10 +1071,11 @@ const Admin = () => {
                         setProductFormData({ ...productFormData, image_url: e.target.value });
                         if (e.target.value) {
                           setImageFile(null);
+                          setImageFiles(null);
                         }
                       }}
                       placeholder="https://example.com/image.jpg"
-                      disabled={!!imageFile}
+                      disabled={!!(imageFile || (imageFiles && imageFiles.length > 0))}
                     />
                   </div>
                 </div>
