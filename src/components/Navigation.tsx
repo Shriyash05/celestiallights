@@ -12,12 +12,14 @@ const Navigation = () => {
     { name: "Home", href: "#home" },
     { name: "About", href: "#about" },
     { name: "Services", href: "#services" },
+    { name: "Products", href: "#products" },
     { name: "Portfolio", href: "#portfolio" },
     { name: "Technology", href: "#technology" },
     { name: "Contact", href: "#contact" },
   ];
 
   const pageLinks = [
+    { name: "All Products", href: "/products" },
     { name: "Full Portfolio", href: "/portfolio" },
   ];
 
