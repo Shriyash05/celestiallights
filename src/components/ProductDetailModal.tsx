@@ -1,8 +1,8 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Star, X, Zap } from 'lucide-react';
+import { Star, X, Zap, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Product {
   id: string;
@@ -36,6 +36,8 @@ interface ProductDetailModalProps {
 
 const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [slideInterval, setSlideInterval] = useState<NodeJS.Timeout | null>(null);
 
   if (!product) return null;
 
@@ -45,12 +47,38 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
     ? [product.image_url] 
     : [];
 
+  // Slideshow functionality
+  useEffect(() => {
+    if (isPlaying && allImages.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+      }, 3000); // Change image every 3 seconds
+      setSlideInterval(interval);
+      return () => clearInterval(interval);
+    } else if (slideInterval) {
+      clearInterval(slideInterval);
+      setSlideInterval(null);
+    }
+  }, [isPlaying, allImages.length]);
+
+  // Reset slideshow when modal opens/closes
+  useEffect(() => {
+    if (!isOpen) {
+      setIsPlaying(false);
+      setCurrentImageIndex(0);
+    }
+  }, [isOpen]);
+
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
   };
 
   const prevImage = () => {
     setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
+  const toggleSlideshow = () => {
+    setIsPlaying(!isPlaying);
   };
 
   return (
@@ -77,35 +105,71 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Image Gallery */}
+          {/* Image Slideshow */}
           {allImages.length > 0 && (
             <div className="space-y-4">
-              <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-                <img
-                  src={allImages[currentImageIndex]}
-                  alt={`${product.title} - Image ${currentImageIndex + 1}`}
-                  className="w-full h-full object-cover"
-                />
+              <div className="relative aspect-video bg-muted rounded-lg overflow-hidden group">
+                <div className="relative w-full h-full">
+                  {allImages.map((image, index) => (
+                    <div
+                      key={index}
+                      className={`absolute inset-0 transition-all duration-500 ease-in-out ${
+                        index === currentImageIndex 
+                          ? 'opacity-100 scale-100' 
+                          : 'opacity-0 scale-105'
+                      }`}
+                    >
+                      <img
+                        src={image}
+                        alt={`${product.title} - Image ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+                
                 {allImages.length > 1 && (
                   <>
+                    {/* Navigation Arrows */}
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="absolute left-4 top-1/2 -translate-y-1/2"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       onClick={prevImage}
                     >
-                      ←
+                      <ChevronLeft className="w-4 h-4" />
                     </Button>
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="absolute right-4 top-1/2 -translate-y-1/2"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       onClick={nextImage}
                     >
-                      →
+                      <ChevronRight className="w-4 h-4" />
                     </Button>
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
-                      {currentImageIndex + 1} / {allImages.length}
+                    
+                    {/* Slideshow Controls */}
+                    <div className="absolute top-4 right-4 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={toggleSlideshow}
+                        className="bg-black/50 hover:bg-black/70 text-white"
+                      >
+                        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      </Button>
+                    </div>
+                    
+                    {/* Image Counter with Progress */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2">
+                      <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                        {currentImageIndex + 1} / {allImages.length}
+                      </div>
+                      {isPlaying && (
+                        <div className="w-8 h-1 bg-white/30 rounded-full overflow-hidden">
+                          <div className="h-full bg-white rounded-full animate-[progress_3s_linear_infinite]"></div>
+                        </div>
+                      )}
                     </div>
                   </>
                 )}
