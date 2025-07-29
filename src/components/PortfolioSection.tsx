@@ -1,52 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Filter } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import residentialImage from "@/assets/residential-lighting.jpg";
 import commercialImage from "@/assets/commercial-project.jpg";
 
+interface Project {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  features: string[];
+  location: string;
+  image_url?: string;
+  is_published: boolean;
+}
+
 const PortfolioSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const projects = [
-    {
-      id: 1,
-      title: "Luxury Residential Complex",
-      category: "residential",
-      image: residentialImage,
-      description: "Smart LED integration with automated control systems for modern living spaces.",
-      features: ["Smart Controls", "Energy Efficient", "Custom Design"],
-      location: "Mumbai, Maharashtra"
-    },
-    {
-      id: 2,
-      title: "Corporate Headquarters",
-      category: "commercial",
-      image: commercialImage,
-      description: "Architectural facade lighting creating a stunning nighttime landmark.",
-      features: ["Facade Lighting", "RGB Controls", "Weather Resistant"],
-      location: "Pune, Maharashtra"
-    },
-    {
-      id: 3,
-      title: "Hotel Ambience Project",
-      category: "hospitality",
-      image: residentialImage,
-      description: "Sophisticated lighting design enhancing guest experience and brand identity.",
-      features: ["Mood Lighting", "Dimming Systems", "Brand Integration"],
-      location: "Goa"
-    },
-    {
-      id: 4,
-      title: "Industrial Facility",
-      category: "industrial",
-      image: commercialImage,
-      description: "High-performance LED solutions for 24/7 industrial operations.",
-      features: ["High Durability", "Low Maintenance", "Safety Compliant"],
-      location: "Chennai, Tamil Nadu"
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('portfolio_projects')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching projects:', error);
+      } else {
+        setProjects(data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // Fallback images
+  const getProjectImage = (project: Project) => {
+    if (project.image_url) return project.image_url;
+    return project.category === 'residential' || project.category === 'hospitality' 
+      ? residentialImage 
+      : commercialImage;
+  };
 
   const filters = [
     { id: "all", label: "All Projects" },
@@ -93,47 +100,69 @@ const PortfolioSection = () => {
 
         {/* Projects Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8 mb-16">
-          {filteredProjects.map((project, index) => (
-            <Card key={project.id} className="overflow-hidden border-0 bg-background hover:shadow-elegant transition-all duration-300 group">
-              <div className="relative overflow-hidden">
-                <img 
-                  src={project.image} 
-                  alt={project.title}
-                  className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <Button 
-                  variant="glow" 
-                  size="icon"
-                  className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
-                    <p className="text-sm text-muted-foreground">{project.location}</p>
+          {loading ? (
+            // Loading skeleton
+            Array.from({ length: 4 }).map((_, index) => (
+              <Card key={index} className="overflow-hidden border-0 bg-background">
+                <div className="w-full h-64 bg-muted animate-pulse" />
+                <CardContent className="p-6 space-y-4">
+                  <div className="h-4 bg-muted rounded animate-pulse" />
+                  <div className="h-3 bg-muted rounded w-2/3 animate-pulse" />
+                  <div className="h-3 bg-muted rounded animate-pulse" />
+                  <div className="flex gap-2">
+                    <div className="h-6 w-16 bg-muted rounded animate-pulse" />
+                    <div className="h-6 w-20 bg-muted rounded animate-pulse" />
                   </div>
-                  <Badge variant="secondary" className="capitalize">
-                    {project.category}
-                  </Badge>
+                </CardContent>
+              </Card>
+            ))
+          ) : filteredProjects.length > 0 ? (
+            filteredProjects.map((project) => (
+              <Card key={project.id} className="overflow-hidden border-0 bg-background hover:shadow-elegant transition-all duration-300 group">
+                <div className="relative overflow-hidden">
+                  <img 
+                    src={getProjectImage(project)} 
+                    alt={project.title}
+                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <Button 
+                    variant="glow" 
+                    size="icon"
+                    className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
                 </div>
                 
-                <p className="text-muted-foreground mb-4">{project.description}</p>
-                
-                <div className="flex flex-wrap gap-2">
-                  {project.features.map((feature, idx) => (
-                    <Badge key={idx} variant="outline" className="text-xs">
-                      {feature}
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
+                      <p className="text-sm text-muted-foreground">{project.location}</p>
+                    </div>
+                    <Badge variant="secondary" className="capitalize">
+                      {project.category}
                     </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                  </div>
+                  
+                  <p className="text-muted-foreground mb-4">{project.description}</p>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {project.features.map((feature, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs">
+                        {feature}
+                      </Badge>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground">No projects found for this category.</p>
+            </div>
+          )}
         </div>
 
         {/* Call to Action */}

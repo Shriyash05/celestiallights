@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Phone, Mail } from "lucide-react";
+import { Menu, X, Phone, User, LogOut, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAdmin, signOut } = useAuth();
 
   const navItems = [
     { name: "Home", href: "#home" },
@@ -45,9 +48,29 @@ const Navigation = () => {
               <Phone className="h-4 w-4" />
               <span>+91 XXX XXX XXXX</span>
             </div>
-            <Button variant="hero" size="sm">
-              Get Quote
-            </Button>
+            {user ? (
+              <div className="flex items-center space-x-2">
+                {isAdmin && (
+                  <Link to="/admin">
+                    <Button variant="outline" size="sm">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Admin
+                    </Button>
+                  </Link>
+                )}
+                <Button variant="outline" size="sm" onClick={signOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Link to="/auth">
+                <Button variant="hero" size="sm">
+                  <User className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -77,10 +100,30 @@ const Navigation = () => {
                 {item.name}
               </a>
             ))}
-            <div className="mt-4 px-3">
-              <Button variant="hero" className="w-full">
-                Get Quote
-              </Button>
+            <div className="mt-4 px-3 space-y-2">
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link to="/admin">
+                      <Button variant="outline" className="w-full">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Admin
+                      </Button>
+                    </Link>
+                  )}
+                  <Button variant="outline" className="w-full" onClick={signOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <Link to="/auth">
+                  <Button variant="hero" className="w-full">
+                    <User className="h-4 w-4 mr-2" />
+                    Sign In
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
