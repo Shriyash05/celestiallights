@@ -40,14 +40,15 @@ const Admin = () => {
     is_published: true,
   });
 
-  // Redirect if not admin
-  if (!loading && (!user || !isAdmin)) {
-    return <Navigate to="/auth" replace />;
-  }
-
+  // All hooks must be called before any early returns
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  // Redirect if not admin (after all hooks are called)
+  if (!loading && (!user || !isAdmin)) {
+    return <Navigate to="/auth" replace />;
+  }
 
   const fetchProjects = async () => {
     const { data, error } = await supabase
