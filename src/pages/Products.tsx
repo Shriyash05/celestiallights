@@ -12,8 +12,7 @@ interface Product {
   title: string;
   category: string;
   description: string;
-  price: number;
-  features: string[];
+  technical_specifications: string[];
   image_url?: string;
   is_published: boolean;
   is_featured: boolean;
@@ -162,11 +161,6 @@ const Products = () => {
                       Featured
                     </Badge>
                   )}
-                  <div className="absolute top-4 right-4">
-                    <Badge variant="secondary" className="bg-background/80 backdrop-blur-sm">
-                      ${product.price}
-                    </Badge>
-                  </div>
                 </div>
                 
                 <CardHeader className="pb-3">
@@ -186,14 +180,14 @@ const Products = () => {
                   </p>
                   
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {product.features.slice(0, 3).map((feature, index) => (
+                    {product.technical_specifications.slice(0, 3).map((spec, index) => (
                       <Badge key={index} variant="outline" className="text-xs">
-                        {feature}
+                        {spec}
                       </Badge>
                     ))}
-                    {product.features.length > 3 && (
+                    {product.technical_specifications.length > 3 && (
                       <Badge variant="outline" className="text-xs">
-                        +{product.features.length - 3} more
+                        +{product.technical_specifications.length - 3} more
                       </Badge>
                     )}
                   </div>

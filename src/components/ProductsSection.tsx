@@ -11,8 +11,7 @@ interface Product {
   title: string;
   category: string;
   description: string;
-  price: number;
-  features: string[];
+  technical_specifications: string[];
   image_url?: string;
   is_featured: boolean;
 }
@@ -122,11 +121,6 @@ const ProductsSection = () => {
                       <Star className="h-3 w-3 mr-1 fill-current" />
                       Featured
                     </Badge>
-                    <div className="absolute top-4 right-4">
-                      <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm text-foreground">
-                        ${product.price}
-                      </Badge>
-                    </div>
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                       <Button variant="secondary" size="sm">
                         <ShoppingCart className="h-4 w-4 mr-2" />
@@ -152,14 +146,14 @@ const ProductsSection = () => {
                     </p>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {product.features.slice(0, 2).map((feature, index) => (
+                      {product.technical_specifications.slice(0, 2).map((spec, index) => (
                         <Badge key={index} variant="outline" className="text-xs">
-                          {feature}
+                          {spec}
                         </Badge>
                       ))}
-                      {product.features.length > 2 && (
+                      {product.technical_specifications.length > 2 && (
                         <Badge variant="outline" className="text-xs">
-                          +{product.features.length - 2} more
+                          +{product.technical_specifications.length - 2} more specs
                         </Badge>
                       )}
                     </div>
