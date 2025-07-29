@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Award, Users, Lightbulb } from "lucide-react";
+import Counter from "@/components/Counter";
 import heroImage from "@/assets/hero-lighting.jpg";
 
 const HeroSection = () => {
@@ -50,21 +51,36 @@ const HeroSection = () => {
               <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-3 mx-auto">
                 <Award className="h-6 w-6 text-primary" />
               </div>
-              <div className="text-2xl font-bold text-primary">24+</div>
+              <Counter 
+                end={24} 
+                suffix="+" 
+                className="text-2xl font-bold text-primary"
+                duration={2500}
+              />
               <div className="text-sm text-muted-foreground">Years Experience</div>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-3 mx-auto">
                 <Users className="h-6 w-6 text-primary" />
               </div>
-              <div className="text-2xl font-bold text-primary">500+</div>
+              <Counter 
+                end={500} 
+                suffix="+" 
+                className="text-2xl font-bold text-primary"
+                duration={3000}
+              />
               <div className="text-sm text-muted-foreground">Projects Completed</div>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center w-12 h-12 bg-primary/10 rounded-lg mb-3 mx-auto">
                 <Lightbulb className="h-6 w-6 text-primary" />
               </div>
-              <div className="text-2xl font-bold text-primary">100%</div>
+              <Counter 
+                end={100} 
+                suffix="%" 
+                className="text-2xl font-bold text-primary"
+                duration={2000}
+              />
               <div className="text-sm text-muted-foreground">Custom Solutions</div>
             </div>
           </div>
