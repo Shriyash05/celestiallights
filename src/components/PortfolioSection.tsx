@@ -236,9 +236,11 @@ const PortfolioSection = () => {
               that exceed your expectations.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg">
-                View Full Portfolio
-              </Button>
+              <Link to="/portfolio">
+                <Button variant="hero" size="lg">
+                  View Full Portfolio
+                </Button>
+              </Link>
               <Button variant="premium" size="lg">
                 Request Consultation
               </Button>

@@ -17,6 +17,10 @@ const Navigation = () => {
     { name: "Contact", href: "#contact" },
   ];
 
+  const pageLinks = [
+    { name: "Full Portfolio", href: "/portfolio" },
+  ];
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,6 +42,15 @@ const Navigation = () => {
                 >
                   {item.name}
                 </a>
+              ))}
+              {pageLinks.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className="text-foreground hover:text-primary transition-colors duration-300"
+                >
+                  {item.name}
+                </Link>
               ))}
             </div>
           </div>
@@ -90,6 +103,16 @@ const Navigation = () => {
               >
                 {item.name}
               </a>
+            ))}
+            {pageLinks.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className="block px-3 py-2 text-foreground hover:text-primary transition-colors duration-300"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
             ))}
             <div className="mt-4 px-3 space-y-2">
               {user && isAdmin && (

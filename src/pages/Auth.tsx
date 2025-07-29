@@ -13,12 +13,9 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn, user } = useAuth();
+  const { signIn, user, loading: authLoading } = useAuth();
 
-  // Redirect if already authenticated
-  if (user) {
-    return <Navigate to="/" replace />;
-  }
+  // Don't redirect - allow non-admin users to access auth page
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
