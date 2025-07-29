@@ -61,12 +61,11 @@ export type Database = {
           category: string
           created_at: string
           description: string
-          features: string[]
           id: string
           image_url: string | null
           is_featured: boolean | null
           is_published: boolean | null
-          price: number
+          technical_specifications: string[]
           title: string
           updated_at: string
         }
@@ -74,12 +73,11 @@ export type Database = {
           category: string
           created_at?: string
           description: string
-          features?: string[]
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
           is_published?: boolean | null
-          price: number
+          technical_specifications?: string[]
           title: string
           updated_at?: string
         }
@@ -87,12 +85,11 @@ export type Database = {
           category?: string
           created_at?: string
           description?: string
-          features?: string[]
           id?: string
           image_url?: string | null
           is_featured?: boolean | null
           is_published?: boolean | null
-          price?: number
+          technical_specifications?: string[]
           title?: string
           updated_at?: string
         }
