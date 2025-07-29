@@ -25,12 +25,26 @@ interface Project {
   is_featured: boolean;
 }
 
+interface Product {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  technical_specifications: string[];
+  image_url?: string;
+  is_published: boolean;
+  is_featured: boolean;
+}
+
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<'projects' | 'products'>('projects');
   const [projects, setProjects] = useState<Project[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     category: '',
@@ -41,12 +55,22 @@ const Admin = () => {
     is_published: true,
     is_featured: false,
   });
+  const [productFormData, setProductFormData] = useState({
+    title: '',
+    category: '',
+    description: '',
+    technical_specifications: '',
+    image_url: '',
+    is_published: true,
+    is_featured: false,
+  });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
   // All hooks must be called before any early returns
   useEffect(() => {
     fetchProjects();
+    fetchProducts();
   }, []);
 
   // Redirect if not admin (after all hooks are called)
@@ -68,6 +92,23 @@ const Admin = () => {
       });
     } else {
       setProjects(data || []);
+    }
+  };
+
+  const fetchProducts = async () => {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      toast({
+        title: "Error fetching products",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      setProducts(data || []);
     }
   };
 
@@ -232,6 +273,129 @@ const Admin = () => {
     }
   };
 
+  const handleProductSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUploading(true);
+    
+    let finalImageUrl = productFormData.image_url;
+    
+    if (imageFile) {
+      const uploadedUrl = await uploadImage(imageFile);
+      if (uploadedUrl) {
+        finalImageUrl = uploadedUrl;
+      } else {
+        setUploading(false);
+        return;
+      }
+    }
+    
+    const productData = {
+      ...productFormData,
+      image_url: finalImageUrl,
+      technical_specifications: productFormData.technical_specifications.split(',').map(spec => spec.trim()).filter(spec => spec),
+    };
+
+    try {
+      if (editingProduct) {
+        const { error } = await supabase
+          .from('products')
+          .update(productData)
+          .eq('id', editingProduct.id);
+
+        if (error) {
+          toast({
+            title: "Error updating product",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Product updated successfully",
+          });
+          resetProductForm();
+          fetchProducts();
+        }
+      } else {
+        const { error } = await supabase
+          .from('products')
+          .insert([productData]);
+
+        if (error) {
+          toast({
+            title: "Error creating product",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Product created successfully",
+          });
+          resetProductForm();
+          fetchProducts();
+        }
+      }
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleProductEdit = (product: Product) => {
+    setEditingProduct(product);
+    setProductFormData({
+      title: product.title,
+      category: product.category,
+      description: product.description,
+      technical_specifications: product.technical_specifications.join(', '),
+      image_url: product.image_url || '',
+      is_published: product.is_published,
+      is_featured: product.is_featured,
+    });
+    setActiveTab('products');
+    setShowForm(true);
+  };
+
+  const handleProductDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this product?')) return;
+
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: "Error deleting product",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Product deleted successfully",
+      });
+      fetchProducts();
+    }
+  };
+
+  const toggleProductFeatured = async (product: Product) => {
+    const { error } = await supabase
+      .from('products')
+      .update({ is_featured: !product.is_featured })
+      .eq('id', product.id);
+
+    if (error) {
+      toast({
+        title: "Error updating product",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: `Product ${!product.is_featured ? 'featured' : 'unfeatured'} successfully`,
+      });
+      fetchProducts();
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
@@ -245,6 +409,21 @@ const Admin = () => {
     });
     setImageFile(null);
     setEditingProject(null);
+    setShowForm(false);
+  };
+
+  const resetProductForm = () => {
+    setProductFormData({
+      title: '',
+      category: '',
+      description: '',
+      technical_specifications: '',
+      image_url: '',
+      is_published: true,
+      is_featured: false,
+    });
+    setImageFile(null);
+    setEditingProduct(null);
     setShowForm(false);
   };
 
@@ -263,13 +442,31 @@ const Admin = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to home
           </Link>
-          <Button onClick={() => setShowForm(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Project
-          </Button>
+          <div className="flex items-center gap-4">
+            <div className="flex bg-muted rounded-lg p-1">
+              <Button 
+                variant={activeTab === 'projects' ? 'secondary' : 'ghost'} 
+                size="sm"
+                onClick={() => setActiveTab('projects')}
+              >
+                Projects
+              </Button>
+              <Button 
+                variant={activeTab === 'products' ? 'secondary' : 'ghost'} 
+                size="sm"
+                onClick={() => setActiveTab('products')}
+              >
+                Products
+              </Button>
+            </div>
+            <Button onClick={() => setShowForm(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add {activeTab === 'projects' ? 'Project' : 'Product'}
+            </Button>
+          </div>
         </div>
 
-        {showForm && (
+        {showForm && activeTab === 'projects' && (
           <Card>
             <CardHeader>
               <CardTitle>{editingProject ? 'Edit Project' : 'Add New Project'}</CardTitle>
@@ -395,64 +592,242 @@ const Admin = () => {
           </Card>
         )}
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Portfolio Projects</CardTitle>
-            <CardDescription>Manage your portfolio projects</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {projects.map((project) => (
-                <div key={project.id} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-semibold text-lg">{project.title}</h3>
-                      <p className="text-sm text-muted-foreground">{project.location}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={project.is_published ? "default" : "secondary"}>
-                        {project.is_published ? "Published" : "Draft"}
-                      </Badge>
-                      <Badge variant={project.is_featured ? "default" : "outline"} className="capitalize">
-                        {project.is_featured ? "★ Featured" : project.category}
-                      </Badge>
-                      <Button
-                        variant={project.is_featured ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleFeatured(project)}
-                        title={project.is_featured ? "Remove from featured" : "Add to featured"}
-                      >
-                        <Star className={`w-4 h-4 ${project.is_featured ? 'fill-current' : ''}`} />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(project)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(project.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+        {showForm && activeTab === 'products' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</CardTitle>
+              <CardDescription>
+                {editingProduct ? 'Update product details' : 'Create a new product'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleProductSubmit} className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="product-title">Title</Label>
+                    <Input
+                      id="product-title"
+                      value={productFormData.title}
+                      onChange={(e) => setProductFormData({ ...productFormData, title: e.target.value })}
+                      required
+                    />
                   </div>
-                  <p className="text-sm">{project.description}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {project.features.map((feature, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs">
-                        {feature}
-                      </Badge>
-                    ))}
+                  <div className="space-y-2">
+                    <Label htmlFor="product-category">Category</Label>
+                    <Select value={productFormData.category} onValueChange={(value) => setProductFormData({ ...productFormData, category: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="led-strips">LED Strips</SelectItem>
+                        <SelectItem value="smart-lighting">Smart Lighting</SelectItem>
+                        <SelectItem value="accessories">Accessories</SelectItem>
+                        <SelectItem value="controllers">Controllers</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="product-description">Description</Label>
+                  <Textarea
+                    id="product-description"
+                    value={productFormData.description}
+                    onChange={(e) => setProductFormData({ ...productFormData, description: e.target.value })}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="product-specs">Technical Specifications (comma-separated)</Label>
+                  <Input
+                    id="product-specs"
+                    value={productFormData.technical_specifications}
+                    onChange={(e) => setProductFormData({ ...productFormData, technical_specifications: e.target.value })}
+                    placeholder="IP65 Rated, 120 LEDs/m, 24V DC"
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="product-image-file">Upload Image from Device</Label>
+                    <Input
+                      id="product-image-file"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        setImageFile(file || null);
+                        if (file) {
+                          setProductFormData({ ...productFormData, image_url: '' });
+                        }
+                      }}
+                    />
+                    {imageFile && (
+                      <p className="text-sm text-muted-foreground">
+                        Selected: {imageFile.name}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="h-px bg-border flex-1" />
+                    <span className="text-xs text-muted-foreground px-2">OR</span>
+                    <div className="h-px bg-border flex-1" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="product-image-url">Image URL</Label>
+                    <Input
+                      id="product-image-url"
+                      value={productFormData.image_url}
+                      onChange={(e) => {
+                        setProductFormData({ ...productFormData, image_url: e.target.value });
+                        if (e.target.value) {
+                          setImageFile(null);
+                        }
+                      }}
+                      placeholder="https://example.com/image.jpg"
+                      disabled={!!imageFile}
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <Button type="submit" disabled={uploading}>
+                    {uploading ? 'Uploading...' : editingProduct ? 'Update Product' : 'Create Product'}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={resetProductForm} disabled={uploading}>
+                    Cancel
+                  </Button>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+        )}
+
+        {activeTab === 'projects' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Portfolio Projects</CardTitle>
+              <CardDescription>Manage your portfolio projects</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {projects.map((project) => (
+                  <div key={project.id} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-semibold text-lg">{project.title}</h3>
+                        <p className="text-sm text-muted-foreground">{project.location}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={project.is_published ? "default" : "secondary"}>
+                          {project.is_published ? "Published" : "Draft"}
+                        </Badge>
+                        <Badge variant={project.is_featured ? "default" : "outline"} className="capitalize">
+                          {project.is_featured ? "★ Featured" : project.category}
+                        </Badge>
+                        <Button
+                          variant={project.is_featured ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => toggleFeatured(project)}
+                          title={project.is_featured ? "Remove from featured" : "Add to featured"}
+                        >
+                          <Star className={`w-4 h-4 ${project.is_featured ? 'fill-current' : ''}`} />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(project)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(project.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm">{project.description}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {project.features.map((feature, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {feature}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {activeTab === 'products' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Products</CardTitle>
+              <CardDescription>Manage your products</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {products.map((product) => (
+                  <div key={product.id} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="font-semibold text-lg">{product.title}</h3>
+                        <p className="text-sm text-muted-foreground">{product.category}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={product.is_published ? "default" : "secondary"}>
+                          {product.is_published ? "Published" : "Draft"}
+                        </Badge>
+                        <Badge variant={product.is_featured ? "default" : "outline"}>
+                          {product.is_featured ? "★ Featured" : "Regular"}
+                        </Badge>
+                        <Button
+                          variant={product.is_featured ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => toggleProductFeatured(product)}
+                          title={product.is_featured ? "Remove from featured" : "Add to featured"}
+                        >
+                          <Star className={`w-4 h-4 ${product.is_featured ? 'fill-current' : ''}`} />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleProductEdit(product)}
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleProductDelete(product.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <p className="text-sm">{product.description}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {(product.technical_specifications || []).map((spec, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {spec}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
