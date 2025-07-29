@@ -242,11 +242,6 @@ const PortfolioSection = () => {
               <Button variant="premium" size="lg">
                 Request Consultation
               </Button>
-              <Link to="/auth">
-                <Button variant="outline" size="lg">
-                  Admin Access
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
