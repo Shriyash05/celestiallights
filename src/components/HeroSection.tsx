@@ -3,31 +3,9 @@ import { ArrowRight, Award, Users, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 import Counter from "@/components/Counter";
 import heroImage from "@/assets/hero-lighting.jpg";
-import { supabase } from "@/integrations/supabase/client";
+import QuoteModal from "@/components/QuoteModal";
 
 const HeroSection = () => {
-  const handleRequestConsultation = async () => {
-    // Open WhatsApp chat
-    window.open('https://wa.me/918976453765', '_blank');
-    
-    // Send quote email
-    try {
-      const { data, error } = await supabase.functions.invoke('send-quote-email', {
-        body: {
-          projectType: 'Consultation Request',
-          customerName: 'Website Visitor',
-        },
-      });
-      
-      if (error) {
-        console.error('Error sending quote email:', error);
-      } else {
-        console.log('Quote email sent successfully:', data);
-      }
-    } catch (error) {
-      console.error('Error sending quote email:', error);
-    }
-  };
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
@@ -66,9 +44,14 @@ const HeroSection = () => {
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Button variant="premium" size="lg" onClick={handleRequestConsultation}>
-              Request Consultation
-            </Button>
+            <QuoteModal 
+              type="consultation"
+              trigger={
+                <Button variant="premium" size="lg">
+                  Request Consultation
+                </Button>
+              }
+            />
           </div>
 
           {/* Stats */}

@@ -1,54 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Phone, Mail, MapPin, Lightbulb } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import QuoteModal from "@/components/QuoteModal";
 
 const Footer = () => {
-  const handleRequestQuote = async () => {
-    // Open WhatsApp chat
-    window.open('https://wa.me/918976453765', '_blank');
-    
-    // Send quote email
-    try {
-      const { data, error } = await supabase.functions.invoke('send-quote-email', {
-        body: {
-          projectType: 'Quote Request',
-          customerName: 'Website Visitor',
-        },
-      });
-      
-      if (error) {
-        console.error('Error sending quote email:', error);
-      } else {
-        console.log('Quote email sent successfully:', data);
-      }
-    } catch (error) {
-      console.error('Error sending quote email:', error);
-    }
-  };
-
-  const handleScheduleConsultation = async () => {
-    // Open WhatsApp chat
-    window.open('https://wa.me/918976453765', '_blank');
-    
-    // Send quote email
-    try {
-      const { data, error } = await supabase.functions.invoke('send-quote-email', {
-        body: {
-          projectType: 'Consultation Schedule Request',
-          customerName: 'Website Visitor',
-        },
-      });
-      
-      if (error) {
-        console.error('Error sending quote email:', error);
-      } else {
-        console.log('Quote email sent successfully:', data);
-      }
-    } catch (error) {
-      console.error('Error sending quote email:', error);
-    }
-  };
 
   const quickLinks = [
     { name: "About Us", href: "#about" },
@@ -135,12 +90,22 @@ const Footer = () => {
               Ready to illuminate your project? Contact us for a free consultation.
             </p>
             <div className="space-y-4">
-              <Button variant="hero" className="w-full" onClick={handleRequestQuote}>
-                Request Quote
-              </Button>
-              <Button variant="outline" className="w-full" onClick={handleScheduleConsultation}>
-                Schedule Consultation
-              </Button>
+              <QuoteModal 
+                type="quote"
+                trigger={
+                  <Button variant="hero" className="w-full">
+                    Request Quote
+                  </Button>
+                }
+              />
+              <QuoteModal 
+                type="consultation"
+                trigger={
+                  <Button variant="outline" className="w-full">
+                    Schedule Consultation
+                  </Button>
+                }
+              />
             </div>
           </div>
         </div>
