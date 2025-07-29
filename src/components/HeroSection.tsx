@@ -3,6 +3,7 @@ import { ArrowRight, Award, Users, Lightbulb } from "lucide-react";
 import { Link } from "react-router-dom";
 import Counter from "@/components/Counter";
 import heroImage from "@/assets/hero-lighting.jpg";
+import { supabase } from "@/integrations/supabase/client";
 
 const HeroSection = () => {
   const handleRequestConsultation = async () => {
@@ -11,19 +12,17 @@ const HeroSection = () => {
     
     // Send quote email
     try {
-      const response = await fetch('/functions/v1/send-quote-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('send-quote-email', {
+        body: {
           projectType: 'Consultation Request',
           customerName: 'Website Visitor',
-        }),
+        },
       });
       
-      if (response.ok) {
-        console.log('Quote email sent successfully');
+      if (error) {
+        console.error('Error sending quote email:', error);
+      } else {
+        console.log('Quote email sent successfully:', data);
       }
     } catch (error) {
       console.error('Error sending quote email:', error);

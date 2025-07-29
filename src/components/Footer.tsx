@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Phone, Mail, MapPin, Lightbulb } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Footer = () => {
   const handleRequestQuote = async () => {
@@ -9,19 +10,17 @@ const Footer = () => {
     
     // Send quote email
     try {
-      const response = await fetch('/functions/v1/send-quote-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('send-quote-email', {
+        body: {
           projectType: 'Quote Request',
           customerName: 'Website Visitor',
-        }),
+        },
       });
       
-      if (response.ok) {
-        console.log('Quote email sent successfully');
+      if (error) {
+        console.error('Error sending quote email:', error);
+      } else {
+        console.log('Quote email sent successfully:', data);
       }
     } catch (error) {
       console.error('Error sending quote email:', error);
@@ -34,19 +33,17 @@ const Footer = () => {
     
     // Send quote email
     try {
-      const response = await fetch('/functions/v1/send-quote-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('send-quote-email', {
+        body: {
           projectType: 'Consultation Schedule Request',
           customerName: 'Website Visitor',
-        }),
+        },
       });
       
-      if (response.ok) {
-        console.log('Quote email sent successfully');
+      if (error) {
+        console.error('Error sending quote email:', error);
+      } else {
+        console.log('Quote email sent successfully:', data);
       }
     } catch (error) {
       console.error('Error sending quote email:', error);
