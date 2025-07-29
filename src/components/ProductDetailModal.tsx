@@ -39,11 +39,9 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
   const [isPlaying, setIsPlaying] = useState(false);
   const [slideInterval, setSlideInterval] = useState<NodeJS.Timeout | null>(null);
 
-  if (!product) return null;
-
-  const allImages = product.images && product.images.length > 0 
+  const allImages = product?.images && product.images.length > 0 
     ? product.images 
-    : product.image_url 
+    : product?.image_url 
     ? [product.image_url] 
     : [];
 
@@ -80,6 +78,8 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
   const toggleSlideshow = () => {
     setIsPlaying(!isPlaying);
   };
+
+  if (!product) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

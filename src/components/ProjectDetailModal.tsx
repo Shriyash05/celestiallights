@@ -28,11 +28,9 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
   const [isPlaying, setIsPlaying] = useState(false);
   const [slideInterval, setSlideInterval] = useState<NodeJS.Timeout | null>(null);
 
-  if (!project) return null;
-
-  const allImages = project.images && project.images.length > 0 
+  const allImages = project?.images && project.images.length > 0 
     ? project.images 
-    : project.image_url 
+    : project?.image_url 
     ? [project.image_url] 
     : [];
 
@@ -69,6 +67,8 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
   const toggleSlideshow = () => {
     setIsPlaying(!isPlaying);
   };
+
+  if (!project) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
