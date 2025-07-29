@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Plus, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface Project {
@@ -22,6 +22,7 @@ interface Project {
   location: string;
   image_url?: string;
   is_published: boolean;
+  is_featured: boolean;
 }
 
 const Admin = () => {
@@ -38,6 +39,7 @@ const Admin = () => {
     location: '',
     image_url: '',
     is_published: true,
+    is_featured: false,
   });
 
   // All hooks must be called before any early returns
@@ -125,6 +127,7 @@ const Admin = () => {
       location: project.location,
       image_url: project.image_url || '',
       is_published: project.is_published,
+      is_featured: project.is_featured,
     });
     setShowForm(true);
   };
@@ -151,6 +154,26 @@ const Admin = () => {
     }
   };
 
+  const toggleFeatured = async (project: Project) => {
+    const { error } = await supabase
+      .from('portfolio_projects')
+      .update({ is_featured: !project.is_featured })
+      .eq('id', project.id);
+
+    if (error) {
+      toast({
+        title: "Error updating project",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: `Project ${!project.is_featured ? 'featured' : 'unfeatured'} successfully`,
+      });
+      fetchProjects();
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
@@ -160,6 +183,7 @@ const Admin = () => {
       location: '',
       image_url: '',
       is_published: true,
+      is_featured: false,
     });
     setEditingProject(null);
     setShowForm(false);
@@ -295,9 +319,17 @@ const Admin = () => {
                       <Badge variant={project.is_published ? "default" : "secondary"}>
                         {project.is_published ? "Published" : "Draft"}
                       </Badge>
-                      <Badge variant="outline" className="capitalize">
-                        {project.category}
+                      <Badge variant={project.is_featured ? "default" : "outline"} className="capitalize">
+                        {project.is_featured ? "★ Featured" : project.category}
                       </Badge>
+                      <Button
+                        variant={project.is_featured ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleFeatured(project)}
+                        title={project.is_featured ? "Remove from featured" : "Add to featured"}
+                      >
+                        <Star className={`w-4 h-4 ${project.is_featured ? 'fill-current' : ''}`} />
+                      </Button>
                       <Button
                         variant="outline"
                         size="sm"

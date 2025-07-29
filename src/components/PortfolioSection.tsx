@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Filter } from "lucide-react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import residentialImage from "@/assets/residential-lighting.jpg";
 import commercialImage from "@/assets/commercial-project.jpg";
@@ -16,11 +17,13 @@ interface Project {
   location: string;
   image_url?: string;
   is_published: boolean;
+  is_featured: boolean;
 }
 
 const PortfolioSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [projects, setProjects] = useState<Project[]>([]);
+  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,6 +42,7 @@ const PortfolioSection = () => {
         console.error('Error fetching projects:', error);
       } else {
         setProjects(data || []);
+        setFeaturedProjects((data || []).filter(project => project.is_featured));
       }
     } catch (error) {
       console.error('Error fetching projects:', error);
@@ -82,6 +86,64 @@ const PortfolioSection = () => {
             quality, and the transformative power of exceptional illumination.
           </p>
         </div>
+
+        {/* Featured Projects Section */}
+        {featuredProjects.length > 0 && (
+          <div className="mb-16">
+            <div className="text-center mb-8">
+              <Badge variant="default" className="mb-4">★ Featured Projects</Badge>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">Spotlight Projects</h3>
+            </div>
+            <div className="grid md:grid-cols-2 gap-8">
+              {featuredProjects.map((project) => (
+                <Card key={`featured-${project.id}`} className="overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-background to-primary/5 hover:shadow-elegant transition-all duration-300 group">
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={getProjectImage(project)} 
+                      alt={project.title}
+                      className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <Badge variant="default" className="bg-primary text-primary-foreground">
+                        ★ Featured
+                      </Badge>
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <Button 
+                      variant="glow" 
+                      size="icon"
+                      className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <CardContent className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-semibold mb-2">{project.title}</h3>
+                        <p className="text-sm text-muted-foreground">{project.location}</p>
+                      </div>
+                      <Badge variant="secondary" className="capitalize">
+                        {project.category}
+                      </Badge>
+                    </div>
+                    
+                    <p className="text-muted-foreground mb-4">{project.description}</p>
+                    
+                    <div className="flex flex-wrap gap-2">
+                      {project.features.map((feature, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {feature}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Filter Buttons */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
@@ -180,6 +242,11 @@ const PortfolioSection = () => {
               <Button variant="premium" size="lg">
                 Request Consultation
               </Button>
+              <Link to="/auth">
+                <Button variant="outline" size="lg">
+                  Admin Access
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

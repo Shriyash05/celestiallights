@@ -42,34 +42,25 @@ const Navigation = () => {
             </div>
           </div>
 
-          {/* Contact Info & CTA */}
+          {/* Contact Info & Admin Access */}
           <div className="hidden lg:flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <Phone className="h-4 w-4" />
               <span>+91 XXX XXX XXXX</span>
             </div>
-            {user ? (
+            {user && isAdmin && (
               <div className="flex items-center space-x-2">
-                {isAdmin && (
-                  <Link to="/admin">
-                    <Button variant="outline" size="sm">
-                      <Settings className="h-4 w-4 mr-2" />
-                      Admin
-                    </Button>
-                  </Link>
-                )}
+                <Link to="/admin">
+                  <Button variant="outline" size="sm">
+                    <Settings className="h-4 w-4 mr-2" />
+                    Admin Panel
+                  </Button>
+                </Link>
                 <Button variant="outline" size="sm" onClick={signOut}>
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out
                 </Button>
               </div>
-            ) : (
-              <Link to="/auth">
-                <Button variant="hero" size="sm">
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In
-                </Button>
-              </Link>
             )}
           </div>
 
@@ -101,28 +92,19 @@ const Navigation = () => {
               </a>
             ))}
             <div className="mt-4 px-3 space-y-2">
-              {user ? (
+              {user && isAdmin && (
                 <>
-                  {isAdmin && (
-                    <Link to="/admin">
-                      <Button variant="outline" className="w-full">
-                        <Settings className="h-4 w-4 mr-2" />
-                        Admin
-                      </Button>
-                    </Link>
-                  )}
+                  <Link to="/admin">
+                    <Button variant="outline" className="w-full">
+                      <Settings className="h-4 w-4 mr-2" />
+                      Admin Panel
+                    </Button>
+                  </Link>
                   <Button variant="outline" className="w-full" onClick={signOut}>
                     <LogOut className="h-4 w-4 mr-2" />
                     Sign Out
                   </Button>
                 </>
-              ) : (
-                <Link to="/auth">
-                  <Button variant="hero" className="w-full">
-                    <User className="h-4 w-4 mr-2" />
-                    Sign In
-                  </Button>
-                </Link>
               )}
             </div>
           </div>

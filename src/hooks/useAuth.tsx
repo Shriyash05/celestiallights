@@ -41,16 +41,24 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Check admin status
-        if (session?.user) {
+        // Check admin status using edge function
+        if (session?.user?.email) {
           setTimeout(async () => {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('role')
-              .eq('id', session.user.id)
-              .single();
-            
-            setIsAdmin(profile?.role === 'admin');
+            try {
+              const { data, error } = await supabase.functions.invoke('check-admin', {
+                body: { email: session.user.email }
+              });
+              
+              if (error) {
+                console.error('Error checking admin status:', error);
+                setIsAdmin(false);
+              } else {
+                setIsAdmin(data?.isAdmin || false);
+              }
+            } catch (error) {
+              console.error('Error calling check-admin function:', error);
+              setIsAdmin(false);
+            }
           }, 0);
         } else {
           setIsAdmin(false);
