@@ -1,7 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Factory, Cog, Zap, Target } from "lucide-react";
+import { Factory, Cog, Zap, Target, User } from "lucide-react";
 import manufacturingImage from "@/assets/manufacturing.jpg";
+import directorPhoto from "@/assets/director-photo.jpg";
 
 const AboutSection = () => {
   const values = [
@@ -72,6 +73,58 @@ const AboutSection = () => {
               className="rounded-2xl shadow-elegant w-full h-[400px] object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/20 to-transparent rounded-2xl"></div>
+          </div>
+        </div>
+
+        {/* Director Section */}
+        <div className="mb-20">
+          <div className="text-center mb-12">
+            <Badge variant="outline" className="mb-4">Leadership</Badge>
+            <h3 className="text-3xl font-bold mb-6">Meet Our Director</h3>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <Card className="border-0 bg-background/50 overflow-hidden">
+              <CardContent className="p-8">
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <div className="text-center md:text-left">
+                    <div className="relative w-48 h-48 mx-auto md:mx-0 mb-6">
+                      <img 
+                        src={directorPhoto} 
+                        alt="Director portrait"
+                        className="w-full h-full object-cover rounded-2xl shadow-elegant"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/10 to-transparent rounded-2xl"></div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 justify-center md:justify-start">
+                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <User className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="text-2xl font-bold">Director</h4>
+                        <p className="text-muted-foreground">Celestial Lights</p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <p className="text-lg text-muted-foreground">
+                        <span className="font-semibold text-foreground">Age:</span> 24 years old
+                      </p>
+                      <p className="text-lg text-muted-foreground">
+                        <span className="font-semibold text-foreground">Background:</span> IT Field
+                      </p>
+                      <p className="text-lg text-muted-foreground">
+                        Bringing fresh perspectives from the technology sector to revolutionize lighting solutions 
+                        with innovative approaches and cutting-edge digital integration.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
