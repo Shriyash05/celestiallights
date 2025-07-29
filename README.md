@@ -1,73 +1,107 @@
-# Welcome to your Lovable project
+# Celestial Lights
 
-## Project info
+Premium LED & Architectural Lighting Solutions
 
-**URL**: https://lovable.dev/projects/a03bdff2-dbb0-4e89-a49b-ca341f349d30
+[Visit Live Site](https://celestiallights.vercel.app/)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## Overview
 
-**Use Lovable**
+Celestial Lights is a modern web application for showcasing and managing bespoke LED and architectural lighting solutions. Built with React, Vite, TypeScript, and Tailwind CSS, the project demonstrates a clean, scalable, and performant approach to web development.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a03bdff2-dbb0-4e89-a49b-ca341f349d30) and start prompting.
+---
 
-Changes made via Lovable will be committed automatically to this repo.
+## Features
 
-**Use your preferred IDE**
+- **Product Catalog:** Browse a curated selection of lighting products.
+- **Custom Lighting Design:** Request custom solutions for residential and commercial spaces.
+- **Smart Lighting Systems:** Explore intelligent, automated lighting options.
+- **Responsive Design:** Fully optimized for all devices.
+- **Admin Panel:** (If implemented) Manage products and content.
+- **Contact & Inquiry Forms:** Easy communication for clients and partners.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Tech Stack
 
-Follow these steps:
+- [React](https://react.dev/)
+- [Vite](https://vitejs.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [Zod](https://zod.dev/) (validation)
+- [React Hook Form](https://react-hook-form.com/)
+- [Supabase](https://supabase.com/) (if used for backend/data)
+- [TanStack Query](https://tanstack.com/query/latest) (data fetching/caching)
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) (v18+ recommended)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+
+### Installation
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone https://github.com/your-username/celestiallights.git
+cd celestiallights
+npm install
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Development
 
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+### Production Build
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```sh
+npm run build
+```
 
-**Use GitHub Codespaces**
+### Preview Production Build
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```sh
+npm run preview
+```
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## Project Structure
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```
+celestiallights/
+├── public/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── hooks/
+│   ├── utils/
+│   └── main.tsx
+├── index.html
+├── package.json
+└── tailwind.config.js
+```
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/a03bdff2-dbb0-4e89-a49b-ca341f349d30) and click on Share -> Publish.
+## Deployment
 
-## Can I connect a custom domain to my Lovable project?
+This project is deployed on [Vercel](https://vercel.com/).
 
-Yes, you can!
+Live: [https://celestiallights.vercel.app/](https://celestiallights.vercel.app/)
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## License
+
+MIT
+
+---
+
+## Author
