@@ -28,8 +28,12 @@ Deno.serve(async (req) => {
     const adminEmail1 = Deno.env.get('ADMIN_EMAIL_1');
     const adminEmail2 = Deno.env.get('ADMIN_EMAIL_2');
 
-    if (!adminEmail1 || !adminEmail2) {
-      console.error('Admin emails not configured in secrets');
+    console.log(`Checking email: ${email}`);
+    console.log(`Admin email 1: ${adminEmail1 ? 'SET' : 'NOT SET'}`);
+    console.log(`Admin email 2: ${adminEmail2 ? 'SET' : 'NOT SET'}`);
+
+    if (!adminEmail1 && !adminEmail2) {
+      console.error('No admin emails configured in secrets');
       return new Response(
         JSON.stringify({ error: 'Admin configuration error' }),
         { 
@@ -40,7 +44,7 @@ Deno.serve(async (req) => {
     }
 
     // Check if the email matches either admin email
-    const isAdmin = email === adminEmail1 || email === adminEmail2;
+    const isAdmin = (adminEmail1 && email === adminEmail1) || (adminEmail2 && email === adminEmail2);
 
     console.log(`Admin check for ${email}: ${isAdmin}`);
 
