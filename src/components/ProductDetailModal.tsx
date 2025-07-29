@@ -14,6 +14,18 @@ interface Product {
   images?: string[];
   is_published: boolean;
   is_featured: boolean;
+  dimensions?: { length?: string; width?: string; height?: string; weight?: string };
+  body_color?: string;
+  beam_angle?: string;
+  power_consumption?: string;
+  ip_rating?: string;
+  color_temperature?: string;
+  lumens_output?: string;
+  material?: string;
+  mounting_type?: string;
+  control_type?: string;
+  warranty_period?: string;
+  certifications?: string[];
 }
 
 interface ProductDetailModalProps {
@@ -125,7 +137,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
           )}
 
           {/* Product Details */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
               <h3 className="text-lg font-semibold mb-2">Product Overview</h3>
               <DialogDescription className="text-base leading-relaxed">
@@ -133,19 +145,157 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
               </DialogDescription>
             </div>
 
+            {/* Structured Technical Specifications */}
             <div>
-              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+              <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5" />
                 Technical Specifications
               </h3>
-              <div className="grid md:grid-cols-2 gap-2">
-                {(product.technical_specifications || []).map((spec, index) => (
-                  <div key={index} className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
-                    <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <span className="text-sm">{spec}</span>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Dimensions */}
+                {product.dimensions && Object.keys(product.dimensions).length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Dimensions</h4>
+                    <div className="space-y-1">
+                      {product.dimensions.length && (
+                        <div className="flex justify-between">
+                          <span>Length:</span>
+                          <span className="font-medium">{product.dimensions.length}</span>
+                        </div>
+                      )}
+                      {product.dimensions.width && (
+                        <div className="flex justify-between">
+                          <span>Width:</span>
+                          <span className="font-medium">{product.dimensions.width}</span>
+                        </div>
+                      )}
+                      {product.dimensions.height && (
+                        <div className="flex justify-between">
+                          <span>Height:</span>
+                          <span className="font-medium">{product.dimensions.height}</span>
+                        </div>
+                      )}
+                      {product.dimensions.weight && (
+                        <div className="flex justify-between">
+                          <span>Weight:</span>
+                          <span className="font-medium">{product.dimensions.weight}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                ))}
+                )}
+
+                {/* Physical Properties */}
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Physical Properties</h4>
+                  <div className="space-y-1">
+                    {product.body_color && (
+                      <div className="flex justify-between">
+                        <span>Body Color:</span>
+                        <span className="font-medium">{product.body_color}</span>
+                      </div>
+                    )}
+                    {product.material && (
+                      <div className="flex justify-between">
+                        <span>Material:</span>
+                        <span className="font-medium">{product.material}</span>
+                      </div>
+                    )}
+                    {product.ip_rating && (
+                      <div className="flex justify-between">
+                        <span>IP Rating:</span>
+                        <span className="font-medium">{product.ip_rating}</span>
+                      </div>
+                    )}
+                    {product.mounting_type && (
+                      <div className="flex justify-between">
+                        <span>Mounting Type:</span>
+                        <span className="font-medium">{product.mounting_type}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Lighting Performance */}
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Lighting Performance</h4>
+                  <div className="space-y-1">
+                    {product.beam_angle && (
+                      <div className="flex justify-between">
+                        <span>Beam Angle:</span>
+                        <span className="font-medium">{product.beam_angle}</span>
+                      </div>
+                    )}
+                    {product.color_temperature && (
+                      <div className="flex justify-between">
+                        <span>Color Temperature:</span>
+                        <span className="font-medium">{product.color_temperature}</span>
+                      </div>
+                    )}
+                    {product.lumens_output && (
+                      <div className="flex justify-between">
+                        <span>Lumens Output:</span>
+                        <span className="font-medium">{product.lumens_output}</span>
+                      </div>
+                    )}
+                    {product.power_consumption && (
+                      <div className="flex justify-between">
+                        <span>Power Consumption:</span>
+                        <span className="font-medium">{product.power_consumption}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Control & Warranty */}
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Control & Warranty</h4>
+                  <div className="space-y-1">
+                    {product.control_type && (
+                      <div className="flex justify-between">
+                        <span>Control Type:</span>
+                        <span className="font-medium">{product.control_type}</span>
+                      </div>
+                    )}
+                    {product.warranty_period && (
+                      <div className="flex justify-between">
+                        <span>Warranty:</span>
+                        <span className="font-medium">{product.warranty_period}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
+
+              {/* Certifications */}
+              {product.certifications && product.certifications.length > 0 && (
+                <div className="mt-6">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide mb-3">Certifications</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {product.certifications.map((cert, index) => (
+                      <Badge key={index} variant="secondary" className="px-3 py-1">
+                        {cert}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Legacy Technical Specifications */}
+              {(product.technical_specifications || []).length > 0 && (
+                <div className="mt-6">
+                  <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide mb-3">Additional Specifications</h4>
+                  <div className="grid md:grid-cols-2 gap-2">
+                    {(product.technical_specifications || []).map((spec, index) => (
+                      <div key={index} className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        <span className="text-sm">{spec}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-4 pt-4 border-t">

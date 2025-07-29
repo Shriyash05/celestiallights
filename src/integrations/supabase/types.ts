@@ -61,43 +61,79 @@ export type Database = {
       }
       products: {
         Row: {
+          beam_angle: string | null
+          body_color: string | null
           category: string
+          certifications: string[] | null
+          color_temperature: string | null
+          control_type: string | null
           created_at: string
           description: string
+          dimensions: Json | null
           id: string
           image_url: string | null
           images: string[] | null
+          ip_rating: string | null
           is_featured: boolean | null
           is_published: boolean | null
+          lumens_output: string | null
+          material: string | null
+          mounting_type: string | null
+          power_consumption: string | null
           technical_specifications: string[]
           title: string
           updated_at: string
+          warranty_period: string | null
         }
         Insert: {
+          beam_angle?: string | null
+          body_color?: string | null
           category: string
+          certifications?: string[] | null
+          color_temperature?: string | null
+          control_type?: string | null
           created_at?: string
           description: string
+          dimensions?: Json | null
           id?: string
           image_url?: string | null
           images?: string[] | null
+          ip_rating?: string | null
           is_featured?: boolean | null
           is_published?: boolean | null
+          lumens_output?: string | null
+          material?: string | null
+          mounting_type?: string | null
+          power_consumption?: string | null
           technical_specifications?: string[]
           title: string
           updated_at?: string
+          warranty_period?: string | null
         }
         Update: {
+          beam_angle?: string | null
+          body_color?: string | null
           category?: string
+          certifications?: string[] | null
+          color_temperature?: string | null
+          control_type?: string | null
           created_at?: string
           description?: string
+          dimensions?: Json | null
           id?: string
           image_url?: string | null
           images?: string[] | null
+          ip_rating?: string | null
           is_featured?: boolean | null
           is_published?: boolean | null
+          lumens_output?: string | null
+          material?: string | null
+          mounting_type?: string | null
+          power_consumption?: string | null
           technical_specifications?: string[]
           title?: string
           updated_at?: string
+          warranty_period?: string | null
         }
         Relationships: []
       }

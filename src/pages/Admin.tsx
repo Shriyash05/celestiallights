@@ -32,8 +32,21 @@ interface Product {
   description: string;
   technical_specifications: string[];
   image_url?: string;
+  images?: string[];
   is_published: boolean;
   is_featured: boolean;
+  dimensions?: { length?: string; width?: string; height?: string; weight?: string };
+  body_color?: string;
+  beam_angle?: string;
+  power_consumption?: string;
+  ip_rating?: string;
+  color_temperature?: string;
+  lumens_output?: string;
+  material?: string;
+  mounting_type?: string;
+  control_type?: string;
+  warranty_period?: string;
+  certifications?: string[];
 }
 
 const Admin = () => {
@@ -63,6 +76,25 @@ const Admin = () => {
     image_url: '',
     is_published: true,
     is_featured: false,
+    // Dimensions
+    length: '',
+    width: '',
+    height: '',
+    weight: '',
+    // Physical properties
+    body_color: '',
+    material: '',
+    ip_rating: '',
+    mounting_type: '',
+    // Lighting specs
+    beam_angle: '',
+    color_temperature: '',
+    lumens_output: '',
+    power_consumption: '',
+    // Control & warranty
+    control_type: '',
+    warranty_period: '',
+    certifications: '',
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -108,7 +140,14 @@ const Admin = () => {
         variant: "destructive",
       });
     } else {
-      setProducts(data || []);
+      // Transform the data to match our interface
+      const transformedProducts = (data || []).map(product => ({
+        ...product,
+        dimensions: (product.dimensions as any) || {},
+        certifications: product.certifications || [],
+        technical_specifications: product.technical_specifications || [],
+      }));
+      setProducts(transformedProducts);
     }
   };
 
@@ -290,9 +329,30 @@ const Admin = () => {
     }
     
     const productData = {
-      ...productFormData,
-      image_url: finalImageUrl,
+      title: productFormData.title,
+      category: productFormData.category,
+      description: productFormData.description,
       technical_specifications: productFormData.technical_specifications.split(',').map(spec => spec.trim()).filter(spec => spec),
+      image_url: finalImageUrl,
+      is_published: productFormData.is_published,
+      is_featured: productFormData.is_featured,
+      dimensions: {
+        length: productFormData.length || undefined,
+        width: productFormData.width || undefined,
+        height: productFormData.height || undefined,
+        weight: productFormData.weight || undefined,
+      },
+      body_color: productFormData.body_color || undefined,
+      beam_angle: productFormData.beam_angle || undefined,
+      power_consumption: productFormData.power_consumption || undefined,
+      ip_rating: productFormData.ip_rating || undefined,
+      color_temperature: productFormData.color_temperature || undefined,
+      lumens_output: productFormData.lumens_output || undefined,
+      material: productFormData.material || undefined,
+      mounting_type: productFormData.mounting_type || undefined,
+      control_type: productFormData.control_type || undefined,
+      warranty_period: productFormData.warranty_period || undefined,
+      certifications: productFormData.certifications.split(',').map(cert => cert.trim()).filter(cert => cert),
     };
 
     try {
@@ -349,6 +409,25 @@ const Admin = () => {
       image_url: product.image_url || '',
       is_published: product.is_published,
       is_featured: product.is_featured,
+      // Dimensions
+      length: product.dimensions?.length || '',
+      width: product.dimensions?.width || '',
+      height: product.dimensions?.height || '',
+      weight: product.dimensions?.weight || '',
+      // Physical properties
+      body_color: product.body_color || '',
+      material: product.material || '',
+      ip_rating: product.ip_rating || '',
+      mounting_type: product.mounting_type || '',
+      // Lighting specs
+      beam_angle: product.beam_angle || '',
+      color_temperature: product.color_temperature || '',
+      lumens_output: product.lumens_output || '',
+      power_consumption: product.power_consumption || '',
+      // Control & warranty
+      control_type: product.control_type || '',
+      warranty_period: product.warranty_period || '',
+      certifications: (product.certifications || []).join(', '),
     });
     setActiveTab('products');
     setShowForm(true);
@@ -421,6 +500,25 @@ const Admin = () => {
       image_url: '',
       is_published: true,
       is_featured: false,
+      // Dimensions
+      length: '',
+      width: '',
+      height: '',
+      weight: '',
+      // Physical properties
+      body_color: '',
+      material: '',
+      ip_rating: '',
+      mounting_type: '',
+      // Lighting specs
+      beam_angle: '',
+      color_temperature: '',
+      lumens_output: '',
+      power_consumption: '',
+      // Control & warranty
+      control_type: '',
+      warranty_period: '',
+      certifications: '',
     });
     setImageFile(null);
     setEditingProduct(null);
@@ -638,15 +736,239 @@ const Admin = () => {
                   />
                 </div>
                 
+                {/* Basic Technical Specifications */}
                 <div className="space-y-2">
-                  <Label htmlFor="product-specs">Technical Specifications (comma-separated)</Label>
+                  <Label htmlFor="product-specs">Legacy Technical Specifications (comma-separated)</Label>
                   <Input
                     id="product-specs"
                     value={productFormData.technical_specifications}
                     onChange={(e) => setProductFormData({ ...productFormData, technical_specifications: e.target.value })}
                     placeholder="IP65 Rated, 120 LEDs/m, 24V DC"
-                    required
                   />
+                </div>
+
+                {/* Structured Technical Specifications */}
+                <div className="space-y-6">
+                  <h3 className="text-lg font-semibold">Detailed Technical Specifications</h3>
+                  
+                  {/* Dimensions Section */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-muted-foreground">Dimensions</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="length">Length</Label>
+                        <Input
+                          id="length"
+                          value={productFormData.length}
+                          onChange={(e) => setProductFormData({ ...productFormData, length: e.target.value })}
+                          placeholder="e.g. 1000mm"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="width">Width</Label>
+                        <Input
+                          id="width"
+                          value={productFormData.width}
+                          onChange={(e) => setProductFormData({ ...productFormData, width: e.target.value })}
+                          placeholder="e.g. 10mm"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="height">Height</Label>
+                        <Input
+                          id="height"
+                          value={productFormData.height}
+                          onChange={(e) => setProductFormData({ ...productFormData, height: e.target.value })}
+                          placeholder="e.g. 3mm"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="weight">Weight</Label>
+                        <Input
+                          id="weight"
+                          value={productFormData.weight}
+                          onChange={(e) => setProductFormData({ ...productFormData, weight: e.target.value })}
+                          placeholder="e.g. 50g/m"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Physical Properties Section */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-muted-foreground">Physical Properties</h4>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="body-color">Body Color</Label>
+                        <Select value={productFormData.body_color} onValueChange={(value) => setProductFormData({ ...productFormData, body_color: value })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select body color" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="black">Black</SelectItem>
+                            <SelectItem value="white">White</SelectItem>
+                            <SelectItem value="silver">Silver</SelectItem>
+                            <SelectItem value="bronze">Bronze</SelectItem>
+                            <SelectItem value="gold">Gold</SelectItem>
+                            <SelectItem value="custom">Custom</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="material">Material</Label>
+                        <Select value={productFormData.material} onValueChange={(value) => setProductFormData({ ...productFormData, material: value })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select material" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="aluminum">Aluminum</SelectItem>
+                            <SelectItem value="plastic">Plastic</SelectItem>
+                            <SelectItem value="glass">Glass</SelectItem>
+                            <SelectItem value="silicone">Silicone</SelectItem>
+                            <SelectItem value="copper">Copper</SelectItem>
+                            <SelectItem value="steel">Steel</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="ip-rating">IP Rating</Label>
+                        <Select value={productFormData.ip_rating} onValueChange={(value) => setProductFormData({ ...productFormData, ip_rating: value })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select IP rating" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="IP20">IP20 - Indoor use</SelectItem>
+                            <SelectItem value="IP44">IP44 - Splash resistant</SelectItem>
+                            <SelectItem value="IP54">IP54 - Dust/water resistant</SelectItem>
+                            <SelectItem value="IP65">IP65 - Waterproof</SelectItem>
+                            <SelectItem value="IP67">IP67 - Submersible</SelectItem>
+                            <SelectItem value="IP68">IP68 - Fully submersible</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="mounting-type">Mounting Type</Label>
+                        <Select value={productFormData.mounting_type} onValueChange={(value) => setProductFormData({ ...productFormData, mounting_type: value })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select mounting type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="surface">Surface Mount</SelectItem>
+                            <SelectItem value="recessed">Recessed</SelectItem>
+                            <SelectItem value="pendant">Pendant</SelectItem>
+                            <SelectItem value="track">Track Mount</SelectItem>
+                            <SelectItem value="magnetic">Magnetic</SelectItem>
+                            <SelectItem value="adhesive">Adhesive</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Lighting Performance Section */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-muted-foreground">Lighting Performance</h4>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="beam-angle">Beam Angle</Label>
+                        <Input
+                          id="beam-angle"
+                          value={productFormData.beam_angle}
+                          onChange={(e) => setProductFormData({ ...productFormData, beam_angle: e.target.value })}
+                          placeholder="e.g. 120°, 60°, Adjustable"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="color-temp">Color Temperature</Label>
+                        <Select value={productFormData.color_temperature} onValueChange={(value) => setProductFormData({ ...productFormData, color_temperature: value })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select color temperature" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="2700K">2700K - Warm White</SelectItem>
+                            <SelectItem value="3000K">3000K - Soft White</SelectItem>
+                            <SelectItem value="4000K">4000K - Natural White</SelectItem>
+                            <SelectItem value="5000K">5000K - Cool White</SelectItem>
+                            <SelectItem value="6500K">6500K - Daylight</SelectItem>
+                            <SelectItem value="RGB">RGB - Full Color</SelectItem>
+                            <SelectItem value="RGBW">RGBW - RGB + White</SelectItem>
+                            <SelectItem value="Tunable">Tunable White</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lumens">Lumens Output</Label>
+                        <Input
+                          id="lumens"
+                          value={productFormData.lumens_output}
+                          onChange={(e) => setProductFormData({ ...productFormData, lumens_output: e.target.value })}
+                          placeholder="e.g. 1000lm/m, 500lm"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="power">Power Consumption</Label>
+                        <Input
+                          id="power"
+                          value={productFormData.power_consumption}
+                          onChange={(e) => setProductFormData({ ...productFormData, power_consumption: e.target.value })}
+                          placeholder="e.g. 12W/m, 24W"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Control & Warranty Section */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-muted-foreground">Control & Warranty</h4>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="control-type">Control Type</Label>
+                        <Select value={productFormData.control_type} onValueChange={(value) => setProductFormData({ ...productFormData, control_type: value })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select control type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="manual">Manual Switch</SelectItem>
+                            <SelectItem value="remote">Remote Control</SelectItem>
+                            <SelectItem value="app">App Controlled</SelectItem>
+                            <SelectItem value="voice">Voice Control</SelectItem>
+                            <SelectItem value="dimmer">Dimmer Compatible</SelectItem>
+                            <SelectItem value="dmx">DMX Compatible</SelectItem>
+                            <SelectItem value="smart">Smart Home Integration</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="warranty">Warranty Period</Label>
+                        <Select value={productFormData.warranty_period} onValueChange={(value) => setProductFormData({ ...productFormData, warranty_period: value })}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select warranty period" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="1-year">1 Year</SelectItem>
+                            <SelectItem value="2-years">2 Years</SelectItem>
+                            <SelectItem value="3-years">3 Years</SelectItem>
+                            <SelectItem value="5-years">5 Years</SelectItem>
+                            <SelectItem value="lifetime">Lifetime</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Certifications Section */}
+                  <div className="space-y-4">
+                    <h4 className="font-medium text-muted-foreground">Certifications</h4>
+                    <div className="space-y-2">
+                      <Label htmlFor="certifications">Certifications (comma-separated)</Label>
+                      <Input
+                        id="certifications"
+                        value={productFormData.certifications}
+                        onChange={(e) => setProductFormData({ ...productFormData, certifications: e.target.value })}
+                        placeholder="e.g. CE, RoHS, FCC, UL Listed"
+                      />
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="space-y-4">
