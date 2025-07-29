@@ -85,22 +85,17 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-start justify-between">
-            <div className="space-y-2">
-              <DialogTitle className="text-2xl font-bold">{product.title}</DialogTitle>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <span className="capitalize">{product.category}</span>
-                {product.is_featured && (
-                  <Badge variant="default" className="ml-2">
-                    <Star className="w-3 h-3 mr-1 fill-current" />
-                    Featured
-                  </Badge>
-                )}
-              </div>
+          <div className="space-y-2">
+            <DialogTitle className="text-2xl font-bold">{product.title}</DialogTitle>
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <span className="capitalize">{product.category}</span>
+              {product.is_featured && (
+                <Badge variant="default" className="ml-2">
+                  <Star className="w-3 h-3 mr-1 fill-current" />
+                  Featured
+                </Badge>
+              )}
             </div>
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="w-4 h-4" />
-            </Button>
           </div>
         </DialogHeader>
 

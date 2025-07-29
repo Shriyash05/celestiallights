@@ -81,7 +81,7 @@ const PortfolioSection = () => {
   };
 
   const filters = [
-    { id: "all", label: "All Projects" },
+    { id: "all", label: "Ongoing Projects" },
     { id: "residential", label: "Residential" },
     { id: "commercial", label: "Commercial" },
     { id: "hospitality", label: "Hospitality" },
