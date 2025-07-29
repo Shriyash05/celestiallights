@@ -109,16 +109,12 @@ const AboutSection = () => {
                       </div>
                     </div>
                     
-                    <div className="space-y-3">
-                      <p className="text-lg text-muted-foreground">
-                        <span className="font-semibold text-foreground">Age:</span> 24 years old
-                      </p>
-                      <p className="text-lg text-muted-foreground">
-                        <span className="font-semibold text-foreground">Background:</span> IT Field
-                      </p>
-                      <p className="text-lg text-muted-foreground">
-                        Bringing fresh perspectives from the technology sector to revolutionize lighting solutions 
-                        with innovative approaches and cutting-edge digital integration.
+                    <div className="space-y-4">
+                      <p className="text-lg text-muted-foreground leading-relaxed">
+                        Our 24-year-old director brings a fresh perspective from the IT field to the lighting industry. 
+                        With a strong background in technology, he leads Celestial Lights with innovative approaches 
+                        and cutting-edge digital integration, revolutionizing traditional lighting solutions through 
+                        modern technological advancements and forward-thinking strategies.
                       </p>
                     </div>
                   </div>
