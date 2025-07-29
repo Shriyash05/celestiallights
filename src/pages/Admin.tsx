@@ -41,6 +41,8 @@ const Admin = () => {
     is_published: true,
     is_featured: false,
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   // All hooks must be called before any early returns
   useEffect(() => {
@@ -69,51 +71,107 @@ const Admin = () => {
     }
   };
 
+  const uploadImage = async (file: File): Promise<string | null> => {
+    try {
+      setUploading(true);
+      
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('project-images')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        toast({
+          title: "Error uploading image",
+          description: uploadError.message,
+          variant: "destructive",
+        });
+        return null;
+      }
+
+      const { data } = supabase.storage
+        .from('project-images')
+        .getPublicUrl(fileName);
+
+      return data.publicUrl;
+    } catch (error: any) {
+      toast({
+        title: "Error uploading image",
+        description: error.message,
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUploading(true);
+    
+    let finalImageUrl = formData.image_url;
+    
+    // If there's a file to upload, upload it first
+    if (imageFile) {
+      const uploadedUrl = await uploadImage(imageFile);
+      if (uploadedUrl) {
+        finalImageUrl = uploadedUrl;
+      } else {
+        setUploading(false);
+        return; // Stop if upload failed
+      }
+    }
     
     const projectData = {
       ...formData,
+      image_url: finalImageUrl,
       features: formData.features.split(',').map(f => f.trim()).filter(f => f),
     };
 
-    if (editingProject) {
-      const { error } = await supabase
-        .from('portfolio_projects')
-        .update(projectData)
-        .eq('id', editingProject.id);
+    try {
+      if (editingProject) {
+        const { error } = await supabase
+          .from('portfolio_projects')
+          .update(projectData)
+          .eq('id', editingProject.id);
 
-      if (error) {
-        toast({
-          title: "Error updating project",
-          description: error.message,
-          variant: "destructive",
-        });
+        if (error) {
+          toast({
+            title: "Error updating project",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Project updated successfully",
+          });
+          resetForm();
+          fetchProjects();
+        }
       } else {
-        toast({
-          title: "Project updated successfully",
-        });
-        resetForm();
-        fetchProjects();
-      }
-    } else {
-      const { error } = await supabase
-        .from('portfolio_projects')
-        .insert([projectData]);
+        const { error } = await supabase
+          .from('portfolio_projects')
+          .insert([projectData]);
 
-      if (error) {
-        toast({
-          title: "Error creating project",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Project created successfully",
-        });
-        resetForm();
-        fetchProjects();
+        if (error) {
+          toast({
+            title: "Error creating project",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Project created successfully",
+          });
+          resetForm();
+          fetchProjects();
+        }
       }
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -185,6 +243,7 @@ const Admin = () => {
       is_published: true,
       is_featured: false,
     });
+    setImageFile(null);
     setEditingProject(null);
     setShowForm(false);
   };
@@ -278,21 +337,56 @@ const Admin = () => {
                   </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="image_url">Image URL (optional)</Label>
-                  <Input
-                    id="image_url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                    placeholder="https://example.com/image.jpg"
-                  />
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="image_file">Upload Image from Device</Label>
+                    <Input
+                      id="image_file"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        setImageFile(file || null);
+                        if (file) {
+                          setFormData({ ...formData, image_url: '' }); // Clear URL when file is selected
+                        }
+                      }}
+                    />
+                    {imageFile && (
+                      <p className="text-sm text-muted-foreground">
+                        Selected: {imageFile.name}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="h-px bg-border flex-1" />
+                    <span className="text-xs text-muted-foreground px-2">OR</span>
+                    <div className="h-px bg-border flex-1" />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="image_url">Image URL</Label>
+                    <Input
+                      id="image_url"
+                      value={formData.image_url}
+                      onChange={(e) => {
+                        setFormData({ ...formData, image_url: e.target.value });
+                        if (e.target.value) {
+                          setImageFile(null); // Clear file when URL is entered
+                        }
+                      }}
+                      placeholder="https://example.com/image.jpg"
+                      disabled={!!imageFile}
+                    />
+                  </div>
                 </div>
                 
                 <div className="flex items-center gap-4">
-                  <Button type="submit">
-                    {editingProject ? 'Update Project' : 'Create Project'}
+                  <Button type="submit" disabled={uploading}>
+                    {uploading ? 'Uploading...' : editingProject ? 'Update Project' : 'Create Project'}
                   </Button>
-                  <Button type="button" variant="outline" onClick={resetForm}>
+                  <Button type="button" variant="outline" onClick={resetForm} disabled={uploading}>
                     Cancel
                   </Button>
                 </div>
