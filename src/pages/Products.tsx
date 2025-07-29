@@ -180,14 +180,14 @@ const Products = () => {
                   </p>
                   
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {product.technical_specifications.slice(0, 3).map((spec, index) => (
+                    {(product.technical_specifications || []).slice(0, 3).map((spec, index) => (
                       <Badge key={index} variant="outline" className="text-xs">
                         {spec}
                       </Badge>
                     ))}
-                    {product.technical_specifications.length > 3 && (
+                    {(product.technical_specifications || []).length > 3 && (
                       <Badge variant="outline" className="text-xs">
-                        +{product.technical_specifications.length - 3} more
+                        +{(product.technical_specifications || []).length - 3} more
                       </Badge>
                     )}
                   </div>

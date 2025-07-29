@@ -146,14 +146,14 @@ const ProductsSection = () => {
                     </p>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {product.technical_specifications.slice(0, 2).map((spec, index) => (
+                      {(product.technical_specifications || []).slice(0, 2).map((spec, index) => (
                         <Badge key={index} variant="outline" className="text-xs">
                           {spec}
                         </Badge>
                       ))}
-                      {product.technical_specifications.length > 2 && (
+                      {(product.technical_specifications || []).length > 2 && (
                         <Badge variant="outline" className="text-xs">
-                          +{product.technical_specifications.length - 2} more specs
+                          +{(product.technical_specifications || []).length - 2} more specs
                         </Badge>
                       )}
                     </div>
