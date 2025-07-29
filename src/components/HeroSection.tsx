@@ -5,10 +5,28 @@ import Counter from "@/components/Counter";
 import heroImage from "@/assets/hero-lighting.jpg";
 
 const HeroSection = () => {
-  const scrollToContact = () => {
-    const contactSection = document.getElementById('contact');
-    if (contactSection) {
-      contactSection.scrollIntoView({ behavior: 'smooth' });
+  const handleRequestConsultation = async () => {
+    // Open WhatsApp chat
+    window.open('https://wa.me/918976453765', '_blank');
+    
+    // Send quote email
+    try {
+      const response = await fetch('/functions/v1/send-quote-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectType: 'Consultation Request',
+          customerName: 'Website Visitor',
+        }),
+      });
+      
+      if (response.ok) {
+        console.log('Quote email sent successfully');
+      }
+    } catch (error) {
+      console.error('Error sending quote email:', error);
     }
   };
   return (
@@ -49,7 +67,7 @@ const HeroSection = () => {
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Button variant="premium" size="lg" onClick={scrollToContact}>
+            <Button variant="premium" size="lg" onClick={handleRequestConsultation}>
               Request Consultation
             </Button>
           </div>

@@ -3,6 +3,56 @@ import { Separator } from "@/components/ui/separator";
 import { Phone, Mail, MapPin, Lightbulb } from "lucide-react";
 
 const Footer = () => {
+  const handleRequestQuote = async () => {
+    // Open WhatsApp chat
+    window.open('https://wa.me/918976453765', '_blank');
+    
+    // Send quote email
+    try {
+      const response = await fetch('/functions/v1/send-quote-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectType: 'Quote Request',
+          customerName: 'Website Visitor',
+        }),
+      });
+      
+      if (response.ok) {
+        console.log('Quote email sent successfully');
+      }
+    } catch (error) {
+      console.error('Error sending quote email:', error);
+    }
+  };
+
+  const handleScheduleConsultation = async () => {
+    // Open WhatsApp chat
+    window.open('https://wa.me/918976453765', '_blank');
+    
+    // Send quote email
+    try {
+      const response = await fetch('/functions/v1/send-quote-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectType: 'Consultation Schedule Request',
+          customerName: 'Website Visitor',
+        }),
+      });
+      
+      if (response.ok) {
+        console.log('Quote email sent successfully');
+      }
+    } catch (error) {
+      console.error('Error sending quote email:', error);
+    }
+  };
+
   const quickLinks = [
     { name: "About Us", href: "#about" },
     { name: "Services", href: "#services" },
@@ -88,10 +138,10 @@ const Footer = () => {
               Ready to illuminate your project? Contact us for a free consultation.
             </p>
             <div className="space-y-4">
-              <Button variant="hero" className="w-full">
+              <Button variant="hero" className="w-full" onClick={handleRequestQuote}>
                 Request Quote
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button variant="outline" className="w-full" onClick={handleScheduleConsultation}>
                 Schedule Consultation
               </Button>
             </div>
