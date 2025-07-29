@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, FileText, Loader2, CheckCircle } from "lucide-react";
+import { Mail, FileText, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface QuoteModalProps {
@@ -14,8 +14,14 @@ interface QuoteModalProps {
   type: "quote" | "consultation";
 }
 
-const QuoteModal = ({ trigger, type }: QuoteModalProps) => {
+const QuoteModal: React.FC<QuoteModalProps> = ({ trigger, type }) => {
   const { toast } = useToast();
+  
+  // Modal state
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Form data state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,9 +33,6 @@ const QuoteModal = ({ trigger, type }: QuoteModalProps) => {
     description: "",
     needsPdf: false,
   });
-
-  const [open, setOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.email || !formData.projectType || !formData.description) {
@@ -46,8 +49,7 @@ const QuoteModal = ({ trigger, type }: QuoteModalProps) => {
     try {
       const subject = type === "quote" ? "Quote Request - Celestial Lights" : "Consultation Request - Celestial Lights";
       
-      const emailBody = `
-Dear Celestial Lights Team,
+      const emailBody = `Dear Celestial Lights Team,
 
 I am interested in your lighting solutions and would like to request a ${type}.
 
@@ -68,8 +70,7 @@ ${formData.needsPdf ? "\nNote: I will attach a detailed PDF with project require
 Thank you for your time. I look forward to hearing from you soon.
 
 Best regards,
-${formData.name}
-      `.trim();
+${formData.name}`;
 
       const mailtoLink = `mailto:info.celestiallight@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
       
@@ -83,7 +84,7 @@ ${formData.name}
         description: "Your email client has been opened with pre-filled information. Please send the email to complete your request.",
       });
       
-      setOpen(false);
+      setIsOpen(false);
       
       // Reset form
       setFormData({
@@ -109,7 +110,7 @@ ${formData.name}
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {trigger}
       </DialogTrigger>
@@ -244,7 +245,7 @@ ${formData.name}
         <div className="flex gap-4 pt-4">
           <Button 
             variant="outline" 
-            onClick={() => setOpen(false)}
+            onClick={() => setIsOpen(false)}
             className="flex-1"
             disabled={isSubmitting}
           >
