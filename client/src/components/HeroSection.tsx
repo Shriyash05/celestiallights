@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import GlowingButton from "@/components/GlowingButton";
 import { ArrowRight, Award, Users, Lightbulb } from "lucide-react";
 import { Link } from "wouter";
 import Counter from "@/components/Counter";
@@ -39,17 +40,17 @@ const HeroSection = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 mb-12">
             <Link to="/portfolio">
-              <Button variant="hero" size="lg" className="group">
+              <GlowingButton size="lg" className="group min-w-[200px]" glowColor="golden" intensity="high">
                 Explore Our Portfolio
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-              </Button>
+              </GlowingButton>
             </Link>
             <QuoteModal 
               type="consultation"
               trigger={
-                <Button variant="premium" size="lg">
+                <GlowingButton variant="outline" size="lg" className="min-w-[200px]" glowColor="blue" intensity="medium">
                   Request Consultation
-                </Button>
+                </GlowingButton>
               }
             />
           </div>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import GlowingButton from "@/components/GlowingButton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -236,10 +237,16 @@ const ContactSection = () => {
                     />
                   </div>
 
-                  <Button type="submit" variant="hero" size="lg" className="w-full group">
+                  <GlowingButton 
+                    type="submit" 
+                    size="lg" 
+                    className="w-full group"
+                    glowColor="golden"
+                    intensity="high"
+                  >
                     <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                     Send Quote Request
-                  </Button>
+                  </GlowingButton>
                 </form>
               </CardContent>
             </Card>
