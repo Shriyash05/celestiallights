@@ -18,6 +18,7 @@ interface Project {
   location: string;
   image_url?: string;
   images?: string[];
+  video_url?: string;
   is_published: boolean;
   is_featured: boolean;
 }

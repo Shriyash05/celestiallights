@@ -65,6 +65,7 @@ const Admin = () => {
     features: '',
     location: '',
     image_url: '',
+    video_url: '',
     is_published: true,
     is_featured: false,
   });
@@ -98,6 +99,7 @@ const Admin = () => {
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageFiles, setImageFiles] = useState<FileList | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
   // All hooks must be called before any early returns
@@ -191,15 +193,60 @@ const Admin = () => {
     return results.filter((url): url is string => url !== null);
   };
 
+  const uploadVideo = async (file: File): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `video-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('project-videos')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        toast({
+          title: "Error uploading video",
+          description: uploadError.message,
+          variant: "destructive",
+        });
+        return null;
+      }
+
+      const { data } = supabase.storage
+        .from('project-videos')
+        .getPublicUrl(fileName);
+
+      return data.publicUrl;
+    } catch (error: any) {
+      toast({
+        title: "Error uploading video",
+        description: error.message,
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setUploading(true);
     
     let finalImageUrl = formData.image_url;
     let finalImages: string[] = [];
+    let finalVideoUrl = formData.video_url;
     
+    // Handle multiple image uploads
+    if (imageFiles && imageFiles.length > 0) {
+      const uploadedUrls = await uploadMultipleImages(imageFiles);
+      if (uploadedUrls.length > 0) {
+        finalImages = uploadedUrls;
+        finalImageUrl = uploadedUrls[0]; // Set first image as main image for legacy support
+      } else {
+        setUploading(false);
+        return;
+      }
+    }
     // Handle single file upload (legacy)
-    if (imageFile) {
+    else if (imageFile) {
       const uploadedUrl = await uploadImage(imageFile);
       if (uploadedUrl) {
         finalImageUrl = uploadedUrl;
@@ -210,10 +257,22 @@ const Admin = () => {
       }
     }
     
+    // Handle video upload
+    if (videoFile) {
+      const uploadedVideoUrl = await uploadVideo(videoFile);
+      if (uploadedVideoUrl) {
+        finalVideoUrl = uploadedVideoUrl;
+      } else {
+        setUploading(false);
+        return;
+      }
+    }
+    
     const projectData = {
       ...formData,
       image_url: finalImageUrl,
       images: finalImages,
+      video_url: finalVideoUrl,
       features: formData.features.split(',').map(f => f.trim()).filter(f => f),
     };
 
@@ -270,6 +329,7 @@ const Admin = () => {
       features: project.features.join(', '),
       location: project.location,
       image_url: project.image_url || '',
+      video_url: project.video_url || '',
       is_published: project.is_published,
       is_featured: project.is_featured,
     });
@@ -504,11 +564,13 @@ const Admin = () => {
       features: '',
       location: '',
       image_url: '',
+      video_url: '',
       is_published: true,
       is_featured: false,
     });
     setImageFile(null);
     setImageFiles(null);
+    setVideoFile(null);
     setEditingProject(null);
     setShowForm(false);
   };
@@ -544,6 +606,7 @@ const Admin = () => {
     });
     setImageFile(null);
     setImageFiles(null);
+    setVideoFile(null);
     setEditingProduct(null);
     setShowForm(false);
   };
@@ -657,6 +720,44 @@ const Admin = () => {
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
+                    <Label htmlFor="image_files_multiple">Upload Multiple Images from Device</Label>
+                    <Input
+                      id="image_files_multiple"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        setImageFiles(files);
+                        if (files && files.length > 0) {
+                          setFormData({ ...formData, image_url: '' });
+                          setImageFile(null);
+                        }
+                      }}
+                    />
+                    {imageFiles && imageFiles.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">
+                          Selected {imageFiles.length} image{imageFiles.length > 1 ? 's' : ''}:
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {Array.from(imageFiles).map((file, index) => (
+                            <div key={index} className="text-xs bg-muted px-2 py-1 rounded">
+                              {file.name}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="h-px bg-border flex-1" />
+                    <span className="text-xs text-muted-foreground px-2">OR SINGLE IMAGE</span>
+                    <div className="h-px bg-border flex-1" />
+                  </div>
+                  
+                  <div className="space-y-2">
                     <Label htmlFor="image_file">Upload Image from Device</Label>
                     <Input
                       id="image_file"
@@ -667,8 +768,10 @@ const Admin = () => {
                         setImageFile(file || null);
                         if (file) {
                           setFormData({ ...formData, image_url: '' }); // Clear URL when file is selected
+                          setImageFiles(null); // Clear multiple files when single file is selected
                         }
                       }}
+                      disabled={!!(imageFiles && imageFiles.length > 0)}
                     />
                     {imageFile && (
                       <p className="text-sm text-muted-foreground">
@@ -692,11 +795,59 @@ const Admin = () => {
                         setFormData({ ...formData, image_url: e.target.value });
                         if (e.target.value) {
                           setImageFile(null); // Clear file when URL is entered
+                          setImageFiles(null); // Clear multiple files when URL is entered
                         }
                       }}
                       placeholder="https://example.com/image.jpg"
-                      disabled={!!imageFile}
+                      disabled={!!(imageFile || (imageFiles && imageFiles.length > 0))}
                     />
+                  </div>
+                  
+                  <div className="space-y-4 border-t pt-4">
+                    <h4 className="font-medium">Video Upload</h4>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="video_file">Upload Video from Device</Label>
+                      <Input
+                        id="video_file"
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          setVideoFile(file || null);
+                          if (file) {
+                            setFormData({ ...formData, video_url: '' }); // Clear URL when file is selected
+                          }
+                        }}
+                      />
+                      {videoFile && (
+                        <p className="text-sm text-muted-foreground">
+                          Selected: {videoFile.name}
+                        </p>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <div className="h-px bg-border flex-1" />
+                      <span className="text-xs text-muted-foreground px-2">OR</span>
+                      <div className="h-px bg-border flex-1" />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="video_url">Video URL</Label>
+                      <Input
+                        id="video_url"
+                        value={formData.video_url}
+                        onChange={(e) => {
+                          setFormData({ ...formData, video_url: e.target.value });
+                          if (e.target.value) {
+                            setVideoFile(null); // Clear file when URL is entered
+                          }
+                        }}
+                        placeholder="https://example.com/video.mp4"
+                        disabled={!!videoFile}
+                      />
+                    </div>
                   </div>
                 </div>
                 

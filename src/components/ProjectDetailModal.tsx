@@ -13,6 +13,7 @@ interface Project {
   location: string;
   image_url?: string;
   images?: string[];
+  video_url?: string;
   is_published: boolean;
   is_featured: boolean;
 }
@@ -182,6 +183,23 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Video Section */}
+          {project.video_url && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Project Video</h3>
+              <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
+                <video
+                  src={project.video_url}
+                  controls
+                  className="w-full h-full object-cover"
+                  preload="metadata"
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
             </div>
           )}
 

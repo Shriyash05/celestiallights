@@ -20,6 +20,7 @@ interface Project {
   features: string[];
   location: string;
   image_url?: string;
+  video_url?: string;
   is_published: boolean;
   is_featured: boolean;
 }
