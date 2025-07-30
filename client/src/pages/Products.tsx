@@ -46,9 +46,15 @@ const Products = () => {
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center gap-4 mb-8">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
+            <Button 
+              variant="ghost" 
+              size="sm"
+              asChild
+            >
+              <Link to="/" className="inline-flex items-center">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Home
+              </Link>
             </Button>
           </div>
           
@@ -83,10 +89,12 @@ const Products = () => {
           <Button 
             variant="ghost" 
             size="sm"
-            onClick={() => setLocation('/')}
+            asChild
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Home
+            <Link to="/" className="inline-flex items-center">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Link>
           </Button>
         </div>
 

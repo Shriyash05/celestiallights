@@ -51,13 +51,17 @@ const Portfolio = () => {
       {/* Header */}
       <div className="bg-gradient-to-br from-primary/10 via-background to-secondary/10 pt-20 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link 
-            to="/" 
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+          <Button 
+            variant="ghost" 
+            size="sm"
+            asChild
+            className="mb-8"
           >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to home
-          </Link>
+            <Link to="/" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to home
+            </Link>
+          </Button>
           
           <div className="text-center space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
