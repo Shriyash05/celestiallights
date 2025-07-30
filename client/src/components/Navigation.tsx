@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, User, LogOut, Settings } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "wouter";
 import { useAuth } from "@/hooks/useAuth";
 
 const Navigation = () => {

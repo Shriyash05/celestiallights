@@ -1,60 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Star, ShoppingCart, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Link } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { Link } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
+import type { Product } from '@shared/schema';
 import ProductDetailModal from './ProductDetailModal';
 
-interface Product {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  technical_specifications: string[];
-  image_url?: string;
-  images?: string[];
-  is_published: boolean;
-  is_featured: boolean;
-}
-
 const ProductsSection = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchFeaturedProducts();
-  }, []);
+  const { data: allProducts = [], isLoading: loading } = useQuery<Product[]>({
+    queryKey: ["/api/products"],
+  });
 
-  const fetchFeaturedProducts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_published', true)
-        .eq('is_featured', true)
-        .order('created_at', { ascending: false })
-        .limit(3);
-
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching featured products:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filter featured products
+  const products = allProducts.filter(product => product.isFeatured).slice(0, 3);
 
   const getProductImage = (product: Product) => {
     // Use first image from images array if available
     if (product.images && product.images.length > 0) {
       return product.images[0];
     }
-    // Fallback to image_url
-    if (product.image_url) return product.image_url;
+    // Fallback to imageUrl  
+    if (product.imageUrl) return product.imageUrl;
     
     // Fallback images based on category
     const fallbackImages = {
@@ -170,14 +141,14 @@ const ProductsSection = () => {
                     </p>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {(product.technical_specifications || []).slice(0, 2).map((spec, index) => (
+                      {(product.technicalSpecifications || []).slice(0, 2).map((spec: string, index: number) => (
                         <Badge key={index} variant="outline" className="text-xs">
                           {spec}
                         </Badge>
                       ))}
-                      {(product.technical_specifications || []).length > 2 && (
+                      {(product.technicalSpecifications || []).length > 2 && (
                         <Badge variant="outline" className="text-xs">
-                          +{(product.technical_specifications || []).length - 2} more specs
+                          +{(product.technicalSpecifications || []).length - 2} more specs
                         </Badge>
                       )}
                     </div>
@@ -203,11 +174,13 @@ const ProductsSection = () => {
         )}
       </div>
       
-      <ProductDetailModal 
-        product={selectedProduct}
-        isOpen={isModalOpen}
-        onClose={closeModal}
-      />
+      {selectedProduct && (
+        <ProductDetailModal 
+          product={selectedProduct}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+        />
+      )}
     </section>
   );
 };

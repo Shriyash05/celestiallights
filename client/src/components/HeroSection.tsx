@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Award, Users, Lightbulb } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "wouter";
 import Counter from "@/components/Counter";
 import heroImage from "@/assets/hero-lighting.jpg";
 import QuoteModal from "@/components/QuoteModal";

@@ -1,63 +1,28 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, MapPin, Star } from "lucide-react";
-import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import type { PortfolioProject } from "@shared/schema";
 
 // Import fallback images
 import residentialLighting from "@/assets/residential-lighting.jpg";
 import commercialProject from "@/assets/commercial-project.jpg";
 import manufacturing from "@/assets/manufacturing.jpg";
 
-interface Project {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  features: string[];
-  location: string;
-  image_url?: string;
-  video_url?: string;
-  is_published: boolean;
-  is_featured: boolean;
-}
-
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState("all");
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+  const { data: projects = [], isLoading: loading, error } = useQuery<PortfolioProject[]>({
+    queryKey: ["/api/portfolio-projects"],
+  });
 
-  const fetchProjects = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("portfolio_projects")
-        .select("*")
-        .eq("is_published", true)
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        console.error("Error fetching projects:", error);
-        return;
-      }
-
-      setProjects(data || []);
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getProjectImage = (project: Project) => {
-    if (project.image_url) {
-      return project.image_url;
+  const getProjectImage = (project: PortfolioProject) => {
+    if (project.imageUrl) {
+      return project.imageUrl;
     }
 
     // Use fallback images based on category

@@ -1,53 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ArrowLeft, Star, ShoppingCart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import type { Product } from '@shared/schema';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProductDetailModal from '@/components/ProductDetailModal';
 
-interface Product {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  technical_specifications: string[];
-  image_url?: string;
-  images?: string[];
-  is_published: boolean;
-  is_featured: boolean;
-}
-
 const Products = () => {
-  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('All');
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .eq('is_published', true)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: products = [], isLoading: loading } = useQuery<Product[]>({
+    queryKey: ["/api/products"],
+  });
 
   const getProductImage = (product: Product) => {
     if (product.image_url) return product.image_url;

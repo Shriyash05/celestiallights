@@ -1,77 +1,42 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Filter } from "lucide-react";
-import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import type { PortfolioProject } from "@shared/schema";
 import residentialImage from "@/assets/residential-lighting.jpg";
 import commercialImage from "@/assets/commercial-project.jpg";
 import ProjectDetailModal from "./ProjectDetailModal";
 
-interface Project {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  features: string[];
-  location: string;
-  image_url?: string;
-  images?: string[];
-  video_url?: string;
-  is_published: boolean;
-  is_featured: boolean;
-}
-
 const PortfolioSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [featuredProjects, setFeaturedProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+  const { data: projects = [], isLoading: loading } = useQuery<PortfolioProject[]>({
+    queryKey: ["/api/portfolio-projects"],
+  });
 
-  const fetchProjects = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('portfolio_projects')
-        .select('*')
-        .eq('is_published', true)
-        .eq('is_featured', true)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Error fetching projects:', error);
-      } else {
-        setProjects(data || []);
-        setFeaturedProjects(data || []); // Only featured projects now
-      }
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Filter only featured projects for the section
+  const featuredProjects = projects.filter(project => project.isFeatured);
 
   // Fallback images
-  const getProjectImage = (project: Project) => {
+  const getProjectImage = (project: PortfolioProject) => {
     // Use first image from images array if available
     if (project.images && project.images.length > 0) {
       return project.images[0];
     }
-    // Fallback to image_url
-    if (project.image_url) return project.image_url;
+    // Fallback to imageUrl
+    if (project.imageUrl) return project.imageUrl;
     // Final fallback to default images
     return project.category === 'residential' || project.category === 'hospitality' 
       ? residentialImage 
       : commercialImage;
   };
 
-  const handleProjectClick = (project: Project) => {
+  const handleProjectClick = (project: PortfolioProject) => {
     setSelectedProject(project);
     setIsModalOpen(true);
   };

@@ -3,30 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, X, Zap, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-
-interface Product {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  technical_specifications: string[];
-  image_url?: string;
-  images?: string[];
-  is_published: boolean;
-  is_featured: boolean;
-  dimensions?: { length?: string; width?: string; height?: string; weight?: string };
-  body_color?: string;
-  beam_angle?: string;
-  power_consumption?: string;
-  ip_rating?: string;
-  color_temperature?: string;
-  lumens_output?: string;
-  material?: string;
-  mounting_type?: string;
-  control_type?: string;
-  warranty_period?: string;
-  certifications?: string[];
-}
+import type { Product } from '@shared/schema';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -41,8 +18,8 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
 
   const allImages = product?.images && product.images.length > 0 
     ? product.images 
-    : product?.image_url 
-    ? [product.image_url] 
+    : product?.imageUrl 
+    ? [product.imageUrl] 
     : [];
 
   // Slideshow functionality
@@ -89,7 +66,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
             <DialogTitle className="text-2xl font-bold">{product.title}</DialogTitle>
             <div className="flex items-center gap-2 text-muted-foreground">
               <span className="capitalize">{product.category}</span>
-              {product.is_featured && (
+              {product.isFeatured && (
                 <Badge variant="default" className="ml-2">
                   <Star className="w-3 h-3 mr-1 fill-current" />
                   Featured
@@ -213,32 +190,32 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
               
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Dimensions */}
-                {product.dimensions && Object.keys(product.dimensions).length > 0 && (
+                {product.dimensions && typeof product.dimensions === 'object' && Object.keys(product.dimensions).length > 0 && (
                   <div className="space-y-2">
                     <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Dimensions</h4>
                     <div className="space-y-1">
-                      {product.dimensions.length && (
+                      {(product.dimensions as any)?.length && (
                         <div className="flex justify-between">
                           <span>Length:</span>
-                          <span className="font-medium">{product.dimensions.length}</span>
+                          <span className="font-medium">{(product.dimensions as any).length}</span>
                         </div>
                       )}
-                      {product.dimensions.width && (
+                      {(product.dimensions as any)?.width && (
                         <div className="flex justify-between">
                           <span>Width:</span>
-                          <span className="font-medium">{product.dimensions.width}</span>
+                          <span className="font-medium">{(product.dimensions as any).width}</span>
                         </div>
                       )}
-                      {product.dimensions.height && (
+                      {(product.dimensions as any)?.height && (
                         <div className="flex justify-between">
                           <span>Height:</span>
-                          <span className="font-medium">{product.dimensions.height}</span>
+                          <span className="font-medium">{(product.dimensions as any).height}</span>
                         </div>
                       )}
-                      {product.dimensions.weight && (
+                      {(product.dimensions as any)?.weight && (
                         <div className="flex justify-between">
                           <span>Weight:</span>
-                          <span className="font-medium">{product.dimensions.weight}</span>
+                          <span className="font-medium">{(product.dimensions as any).weight}</span>
                         </div>
                       )}
                     </div>
@@ -249,10 +226,10 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
                 <div className="space-y-2">
                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Physical Properties</h4>
                   <div className="space-y-1">
-                    {product.body_color && (
+                    {product.bodyColor && (
                       <div className="flex justify-between">
                         <span>Body Color:</span>
-                        <span className="font-medium">{product.body_color}</span>
+                        <span className="font-medium">{product.bodyColor}</span>
                       </div>
                     )}
                     {product.material && (
@@ -261,16 +238,16 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
                         <span className="font-medium">{product.material}</span>
                       </div>
                     )}
-                    {product.ip_rating && (
+                    {product.ipRating && (
                       <div className="flex justify-between">
                         <span>IP Rating:</span>
-                        <span className="font-medium">{product.ip_rating}</span>
+                        <span className="font-medium">{product.ipRating}</span>
                       </div>
                     )}
-                    {product.mounting_type && (
+                    {product.mountingType && (
                       <div className="flex justify-between">
                         <span>Mounting Type:</span>
-                        <span className="font-medium">{product.mounting_type}</span>
+                        <span className="font-medium">{product.mountingType}</span>
                       </div>
                     )}
                   </div>
@@ -280,28 +257,28 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
                 <div className="space-y-2">
                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Lighting Performance</h4>
                   <div className="space-y-1">
-                    {product.beam_angle && (
+                    {product.beamAngle && (
                       <div className="flex justify-between">
                         <span>Beam Angle:</span>
-                        <span className="font-medium">{product.beam_angle}</span>
+                        <span className="font-medium">{product.beamAngle}</span>
                       </div>
                     )}
-                    {product.color_temperature && (
+                    {product.colorTemperature && (
                       <div className="flex justify-between">
                         <span>Color Temperature:</span>
-                        <span className="font-medium">{product.color_temperature}</span>
+                        <span className="font-medium">{product.colorTemperature}</span>
                       </div>
                     )}
-                    {product.lumens_output && (
+                    {product.lumensOutput && (
                       <div className="flex justify-between">
                         <span>Lumens Output:</span>
-                        <span className="font-medium">{product.lumens_output}</span>
+                        <span className="font-medium">{product.lumensOutput}</span>
                       </div>
                     )}
-                    {product.power_consumption && (
+                    {product.powerConsumption && (
                       <div className="flex justify-between">
                         <span>Power Consumption:</span>
-                        <span className="font-medium">{product.power_consumption}</span>
+                        <span className="font-medium">{product.powerConsumption}</span>
                       </div>
                     )}
                   </div>
@@ -311,16 +288,16 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
                 <div className="space-y-2">
                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Control & Warranty</h4>
                   <div className="space-y-1">
-                    {product.control_type && (
+                    {product.controlType && (
                       <div className="flex justify-between">
                         <span>Control Type:</span>
-                        <span className="font-medium">{product.control_type}</span>
+                        <span className="font-medium">{product.controlType}</span>
                       </div>
                     )}
-                    {product.warranty_period && (
+                    {product.warrantyPeriod && (
                       <div className="flex justify-between">
                         <span>Warranty:</span>
-                        <span className="font-medium">{product.warranty_period}</span>
+                        <span className="font-medium">{product.warrantyPeriod}</span>
                       </div>
                     )}
                   </div>
@@ -342,11 +319,11 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
               )}
 
               {/* Legacy Technical Specifications */}
-              {(product.technical_specifications || []).length > 0 && (
+              {(product.technicalSpecifications || []).length > 0 && (
                 <div className="mt-6">
                   <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide mb-3">Additional Specifications</h4>
                   <div className="grid md:grid-cols-2 gap-2">
-                    {(product.technical_specifications || []).map((spec, index) => (
+                    {(product.technicalSpecifications || []).map((spec, index) => (
                       <div key={index} className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                         <div className="w-2 h-2 bg-primary rounded-full"></div>
                         <span className="text-sm">{spec}</span>
@@ -366,8 +343,8 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">Status:</span>
-                <Badge variant={product.is_published ? "default" : "secondary"}>
-                  {product.is_published ? "Published" : "Draft"}
+                <Badge variant={product.isPublished ? "default" : "secondary"}>
+                  {product.isPublished ? "Published" : "Draft"}
                 </Badge>
               </div>
             </div>

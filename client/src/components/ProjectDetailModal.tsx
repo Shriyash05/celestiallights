@@ -3,23 +3,10 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star, X, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-
-interface Project {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  features: string[];
-  location: string;
-  image_url?: string;
-  images?: string[];
-  video_url?: string;
-  is_published: boolean;
-  is_featured: boolean;
-}
+import type { PortfolioProject } from '@shared/schema';
 
 interface ProjectDetailModalProps {
-  project: Project | null;
+  project: PortfolioProject | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -31,8 +18,8 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
 
   const allImages = project?.images && project.images.length > 0 
     ? project.images 
-    : project?.image_url 
-    ? [project.image_url] 
+    : project?.imageUrl 
+    ? [project.imageUrl] 
     : [];
 
   // Slideshow functionality
@@ -80,7 +67,7 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
             <div className="flex items-center gap-2 text-muted-foreground">
               <MapPin className="w-4 h-4" />
               <span>{project.location}</span>
-              {project.is_featured && (
+              {project.isFeatured && (
                 <Badge variant="default" className="ml-2">
                   <Star className="w-3 h-3 mr-1 fill-current" />
                   Featured
@@ -187,12 +174,12 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
           )}
 
           {/* Video Section */}
-          {project.video_url && (
+          {project.videoUrl && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Project Video</h3>
               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
                 <video
-                  src={project.video_url}
+                  src={project.videoUrl}
                   controls
                   className="w-full h-full object-cover"
                   preload="metadata"
@@ -232,8 +219,8 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">Status:</span>
-                <Badge variant={project.is_published ? "default" : "secondary"}>
-                  {project.is_published ? "Published" : "Draft"}
+                <Badge variant={project.isPublished ? "default" : "secondary"}>
+                  {project.isPublished ? "Published" : "Draft"}
                 </Badge>
               </div>
             </div>
