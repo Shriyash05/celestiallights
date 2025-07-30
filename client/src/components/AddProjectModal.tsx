@@ -1,0 +1,319 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { X, Plus } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { FileUpload } from "./FileUpload";
+
+interface AddProjectModalProps {
+  trigger: React.ReactNode;
+}
+
+const AddProjectModal = ({ trigger }: AddProjectModalProps) => {
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    category: "",
+    description: "",
+    features: [] as string[],
+    location: "",
+    images: [] as string[],
+    videos: [] as string[],
+    isPublished: true,
+    isFeatured: false,
+  });
+
+  const [newFeature, setNewFeature] = useState("");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const createMutation = useMutation({
+    mutationFn: async (projectData: typeof formData) => {
+      return await apiRequest("POST", "/api/portfolio-projects", projectData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/portfolio-projects"] });
+      toast({
+        title: "Success",
+        description: "Project added successfully!",
+      });
+      setOpen(false);
+      resetForm();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add project",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      category: "",
+      description: "",
+      features: [],
+      location: "",
+      images: [],
+      videos: [],
+      isPublished: true,
+      isFeatured: false,
+    });
+    setNewFeature("");
+  };
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const addFeature = () => {
+    if (newFeature.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        features: [...prev.features, newFeature.trim()]
+      }));
+      setNewFeature("");
+    }
+  };
+
+  const removeFeature = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      features: prev.features.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleFileUpload = (uploadedFiles: any[], type: 'images' | 'videos') => {
+    const fileUrls = uploadedFiles.map(file => file.url || file.filename);
+    setFormData(prev => ({
+      ...prev,
+      [type]: [...prev[type], ...fileUrls]
+    }));
+  };
+
+  const removeFile = (index: number, type: 'images' | 'videos') => {
+    setFormData(prev => ({
+      ...prev,
+      [type]: prev[type].filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title || !formData.category || !formData.description || !formData.location) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    createMutation.mutate(formData);
+  };
+
+  const categories = [
+    "residential",
+    "commercial", 
+    "hospitality",
+    "industrial",
+    "manufacturing",
+    "healthcare",
+    "education",
+    "retail"
+  ];
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {trigger}
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold">Add New Project</DialogTitle>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="title">Project Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => handleInputChange("title", e.target.value)}
+                placeholder="e.g., Modern Office Complex Lighting"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="location">Location *</Label>
+              <Input
+                id="location"
+                value={formData.location}
+                onChange={(e) => handleInputChange("location", e.target.value)}
+                placeholder="e.g., Mumbai, Maharashtra"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="category">Category *</Label>
+            <Select 
+              value={formData.category} 
+              onValueChange={(value) => handleInputChange("category", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat} value={cat} className="capitalize">{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="description">Description *</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              placeholder="Detailed project description..."
+              rows={4}
+              required
+            />
+          </div>
+
+          {/* Features */}
+          <div>
+            <Label>Project Features</Label>
+            <div className="flex gap-2 mt-2">
+              <Input
+                value={newFeature}
+                onChange={(e) => setNewFeature(e.target.value)}
+                placeholder="Add project feature..."
+                onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addFeature())}
+              />
+              <Button type="button" onClick={addFeature} size="sm">
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+            {formData.features.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.features.map((feature, index) => (
+                  <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                    {feature}
+                    <X 
+                      className="h-3 w-3 cursor-pointer" 
+                      onClick={() => removeFeature(index)}
+                    />
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <Label>Project Images</Label>
+            <FileUpload onFilesUploaded={(files) => handleFileUpload(files, 'images')} accept="image/*" />
+            {formData.images.length > 0 && (
+              <div className="grid grid-cols-4 gap-2 mt-2">
+                {formData.images.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <img 
+                      src={`/uploads/${image}`} 
+                      alt={`Project ${index + 1}`}
+                      className="w-full h-20 object-cover rounded border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => removeFile(index, 'images')}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Video Upload */}
+          <div>
+            <Label>Project Videos</Label>
+            <FileUpload onFilesUploaded={(files) => handleFileUpload(files, 'videos')} accept="video/*" />
+            {formData.videos.length > 0 && (
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {formData.videos.map((video, index) => (
+                  <div key={index} className="relative group">
+                    <video 
+                      src={`/uploads/${video}`} 
+                      className="w-full h-20 object-cover rounded border"
+                      controls
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => removeFile(index, 'videos')}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Settings */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isPublished"
+                checked={formData.isPublished}
+                onCheckedChange={(checked) => handleInputChange("isPublished", checked)}
+              />
+              <Label htmlFor="isPublished">Published</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isFeatured"
+                checked={formData.isFeatured}
+                onCheckedChange={(checked) => handleInputChange("isFeatured", checked)}
+              />
+              <Label htmlFor="isFeatured">Featured</Label>
+            </div>
+          </div>
+
+          {/* Submit Buttons */}
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={createMutation.isPending}>
+              {createMutation.isPending ? "Adding..." : "Add Project"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default AddProjectModal;

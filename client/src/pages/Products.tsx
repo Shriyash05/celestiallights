@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { Product } from '@shared/schema';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProductDetailModal from '@/components/ProductDetailModal';
+import QuoteModal from '@/components/QuoteModal';
 
 const Products = () => {
   const [activeFilter, setActiveFilter] = useState('All');
@@ -200,9 +201,14 @@ const Products = () => {
             Contact our experts to find the perfect lighting solution for your project. 
             We provide consultation, installation, and ongoing support.
           </p>
-          <Button size="lg">
-            Get Free Consultation
-          </Button>
+          <QuoteModal 
+            trigger={
+              <Button size="lg">
+                Get Free Consultation
+              </Button>
+            }
+            type="consultation" 
+          />
         </div>
       </div>
       

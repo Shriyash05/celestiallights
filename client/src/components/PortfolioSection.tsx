@@ -2,18 +2,20 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Filter } from "lucide-react";
+import { ExternalLink, Filter, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { PortfolioProject } from "@shared/schema";
 import residentialImage from "@/assets/residential-lighting.jpg";
 import commercialImage from "@/assets/commercial-project.jpg";
 import ProjectDetailModal from "./ProjectDetailModal";
+import { useAuth } from "@/hooks/useAuth";
 
 const PortfolioSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
   const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user } = useAuth();
 
   const { data: projects = [], isLoading: loading } = useQuery<PortfolioProject[]>({
     queryKey: ["/api/portfolio-projects"],
@@ -21,6 +23,8 @@ const PortfolioSection = () => {
 
   // Filter only featured projects for the section
   const featuredProjects = projects.filter(project => project.isFeatured);
+  // Non-featured projects only show when logged in
+  const nonFeaturedProjects = projects.filter(project => !project.isFeatured);
 
   // Fallback images
   const getProjectImage = (project: PortfolioProject) => {
@@ -134,6 +138,65 @@ const PortfolioSection = () => {
                         </Badge>
                       )}
                     </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* View Full Portfolio Button */}
+            <div className="text-center mt-8">
+              <Button asChild variant="outline" size="lg" className="group">
+                <Link to="/portfolio" className="inline-flex items-center">
+                  View Full Portfolio
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Additional Projects (only visible when logged in) */}
+        {user && nonFeaturedProjects.length > 0 && (
+          <div className="mb-16">
+            <div className="text-center mb-8">
+              <Badge variant="secondary" className="mb-4">Additional Projects</Badge>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">More Recent Work</h3>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {nonFeaturedProjects.slice(0, 6).map((project) => (
+                <Card 
+                  key={`additional-${project.id}`} 
+                  className="overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                  onClick={() => handleProjectClick(project)}
+                >
+                  <div className="relative overflow-hidden">
+                    <img 
+                      src={getProjectImage(project)} 
+                      alt={project.title}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h4 className="text-lg font-semibold mb-1">{project.title}</h4>
+                        <p className="text-sm text-muted-foreground">{project.location}</p>
+                      </div>
+                      <Badge variant="outline" className="capitalize text-xs">
+                        {project.category}
+                      </Badge>
+                    </div>
+                    
+                    <p className="text-muted-foreground text-sm line-clamp-2">{project.description}</p>
                   </CardContent>
                 </Card>
               ))}

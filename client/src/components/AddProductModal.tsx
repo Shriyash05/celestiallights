@@ -1,0 +1,535 @@
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { X, Upload, Plus } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { FileUpload } from "./FileUpload";
+
+interface AddProductModalProps {
+  trigger: React.ReactNode;
+}
+
+const AddProductModal = ({ trigger }: AddProductModalProps) => {
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    category: "",
+    description: "",
+    technicalSpecifications: [] as string[],
+    images: [] as string[],
+    isPublished: true,
+    isFeatured: false,
+    // Technical specification fields
+    dimensions: { length: "", width: "", height: "", weight: "" },
+    bodyColor: "",
+    beamAngle: "",
+    powerConsumption: "",
+    ipRating: "",
+    colorTemperature: "",
+    lumensOutput: "",
+    material: "",
+    mountingType: "",
+    controlType: "",
+    warrantyPeriod: "",
+    certifications: [] as string[],
+  });
+
+  const [newSpec, setNewSpec] = useState("");
+  const [newCertification, setNewCertification] = useState("");
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const createMutation = useMutation({
+    mutationFn: async (productData: typeof formData) => {
+      return await apiRequest("POST", "/api/products", productData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      toast({
+        title: "Success",
+        description: "Product added successfully!",
+      });
+      setOpen(false);
+      resetForm();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add product",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      category: "",
+      description: "",
+      technicalSpecifications: [],
+      images: [],
+      isPublished: true,
+      isFeatured: false,
+      dimensions: { length: "", width: "", height: "", weight: "" },
+      bodyColor: "",
+      beamAngle: "",
+      powerConsumption: "",
+      ipRating: "",
+      colorTemperature: "",
+      lumensOutput: "",
+      material: "",
+      mountingType: "",
+      controlType: "",
+      warrantyPeriod: "",
+      certifications: [],
+    });
+    setNewSpec("");
+    setNewCertification("");
+  };
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleDimensionChange = (dimension: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      dimensions: { ...prev.dimensions, [dimension]: value }
+    }));
+  };
+
+  const addTechnicalSpec = () => {
+    if (newSpec.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        technicalSpecifications: [...prev.technicalSpecifications, newSpec.trim()]
+      }));
+      setNewSpec("");
+    }
+  };
+
+  const removeTechnicalSpec = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      technicalSpecifications: prev.technicalSpecifications.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addCertification = () => {
+    if (newCertification.trim()) {
+      setFormData(prev => ({
+        ...prev,
+        certifications: [...prev.certifications, newCertification.trim()]
+      }));
+      setNewCertification("");
+    }
+  };
+
+  const removeCertification = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      certifications: prev.certifications.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleFileUpload = (uploadedFiles: any[]) => {
+    const fileUrls = uploadedFiles.map(file => file.url || file.filename);
+    setFormData(prev => ({
+      ...prev,
+      images: [...prev.images, ...fileUrls]
+    }));
+  };
+
+  const removeImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.title || !formData.category || !formData.description) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+    createMutation.mutate(formData);
+  };
+
+  const categories = [
+    "Smart Lighting",
+    "Outdoor Lighting", 
+    "Indoor Lighting",
+    "Solar Lighting",
+    "Decorative Lighting",
+    "Industrial Lighting",
+    "Emergency Lighting"
+  ];
+
+  const ipRatings = [
+    "IP20", "IP21", "IP22", "IP23", "IP24", "IP25",
+    "IP30", "IP31", "IP32", "IP33", "IP34", "IP35",
+    "IP40", "IP41", "IP42", "IP43", "IP44", "IP45",
+    "IP50", "IP51", "IP52", "IP53", "IP54", "IP55",
+    "IP60", "IP61", "IP62", "IP63", "IP64", "IP65", "IP66", "IP67", "IP68"
+  ];
+
+  const mountingTypes = [
+    "Surface Mount", "Recessed Mount", "Pendant Mount", "Track Mount",
+    "Wall Mount", "Ceiling Mount", "Pole Mount", "Ground Mount",
+    "Under Cabinet", "Strip Mount", "Flush Mount"
+  ];
+
+  const controlTypes = [
+    "Manual Switch", "Dimmer Switch", "Motion Sensor", "Daylight Sensor",
+    "Smart Control", "WiFi Control", "Bluetooth Control", "RF Remote",
+    "DMX Control", "0-10V Dimming", "DALI Control", "KNX Control"
+  ];
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {trigger}
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold">Add New Product</DialogTitle>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Information */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="title">Product Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => handleInputChange("title", e.target.value)}
+                placeholder="e.g., LED Strip Light Pro"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="category">Category *</Label>
+              <Select 
+                value={formData.category} 
+                onValueChange={(value) => handleInputChange("category", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <div>
+            <Label htmlFor="description">Description *</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => handleInputChange("description", e.target.value)}
+              placeholder="Detailed product description..."
+              rows={4}
+              required
+            />
+          </div>
+
+          {/* Technical Specifications Section */}
+          <div className="border rounded-lg p-4">
+            <h3 className="text-lg font-semibold mb-4">Technical Specifications</h3>
+            
+            {/* Dimensions */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+              <div>
+                <Label htmlFor="length">Length (mm)</Label>
+                <Input
+                  id="length"
+                  value={formData.dimensions.length}
+                  onChange={(e) => handleDimensionChange("length", e.target.value)}
+                  placeholder="e.g., 1200"
+                />
+              </div>
+              <div>
+                <Label htmlFor="width">Width (mm)</Label>
+                <Input
+                  id="width"
+                  value={formData.dimensions.width}
+                  onChange={(e) => handleDimensionChange("width", e.target.value)}
+                  placeholder="e.g., 50"
+                />
+              </div>
+              <div>
+                <Label htmlFor="height">Height (mm)</Label>
+                <Input
+                  id="height"
+                  value={formData.dimensions.height}
+                  onChange={(e) => handleDimensionChange("height", e.target.value)}
+                  placeholder="e.g., 12"
+                />
+              </div>
+              <div>
+                <Label htmlFor="weight">Weight (g)</Label>
+                <Input
+                  id="weight"
+                  value={formData.dimensions.weight}
+                  onChange={(e) => handleDimensionChange("weight", e.target.value)}
+                  placeholder="e.g., 450"
+                />
+              </div>
+            </div>
+
+            {/* Other Technical Specs */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <Label htmlFor="powerConsumption">Power Consumption</Label>
+                <Input
+                  id="powerConsumption"
+                  value={formData.powerConsumption}
+                  onChange={(e) => handleInputChange("powerConsumption", e.target.value)}
+                  placeholder="e.g., 24W, 120W/m"
+                />
+              </div>
+              <div>
+                <Label htmlFor="lumensOutput">Lumens Output</Label>
+                <Input
+                  id="lumensOutput"
+                  value={formData.lumensOutput}
+                  onChange={(e) => handleInputChange("lumensOutput", e.target.value)}
+                  placeholder="e.g., 2400lm, 1800lm/m"
+                />
+              </div>
+              <div>
+                <Label htmlFor="colorTemperature">Color Temperature</Label>
+                <Input
+                  id="colorTemperature"
+                  value={formData.colorTemperature}
+                  onChange={(e) => handleInputChange("colorTemperature", e.target.value)}
+                  placeholder="e.g., 3000K, 2700K-6500K"
+                />
+              </div>
+              <div>
+                <Label htmlFor="beamAngle">Beam Angle</Label>
+                <Input
+                  id="beamAngle"
+                  value={formData.beamAngle}
+                  onChange={(e) => handleInputChange("beamAngle", e.target.value)}
+                  placeholder="e.g., 120°, 15°-60°"
+                />
+              </div>
+              <div>
+                <Label htmlFor="bodyColor">Body Color</Label>
+                <Input
+                  id="bodyColor"
+                  value={formData.bodyColor}
+                  onChange={(e) => handleInputChange("bodyColor", e.target.value)}
+                  placeholder="e.g., White, Black, Silver"
+                />
+              </div>
+              <div>
+                <Label htmlFor="material">Material</Label>
+                <Input
+                  id="material"
+                  value={formData.material}
+                  onChange={(e) => handleInputChange("material", e.target.value)}
+                  placeholder="e.g., Aluminum, PC, Silicone"
+                />
+              </div>
+              <div>
+                <Label htmlFor="ipRating">IP Rating</Label>
+                <Select 
+                  value={formData.ipRating} 
+                  onValueChange={(value) => handleInputChange("ipRating", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select IP rating" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ipRatings.map((rating) => (
+                      <SelectItem key={rating} value={rating}>{rating}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="mountingType">Mounting Type</Label>
+                <Select 
+                  value={formData.mountingType} 
+                  onValueChange={(value) => handleInputChange("mountingType", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select mounting type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mountingTypes.map((type) => (
+                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="controlType">Control Type</Label>
+                <Select 
+                  value={formData.controlType} 
+                  onValueChange={(value) => handleInputChange("controlType", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select control type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {controlTypes.map((type) => (
+                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="warrantyPeriod">Warranty Period</Label>
+                <Input
+                  id="warrantyPeriod"
+                  value={formData.warrantyPeriod}
+                  onChange={(e) => handleInputChange("warrantyPeriod", e.target.value)}
+                  placeholder="e.g., 2 years, 5 years"
+                />
+              </div>
+            </div>
+
+            {/* Additional Technical Specifications */}
+            <div className="mb-4">
+              <Label>Additional Technical Specifications</Label>
+              <div className="flex gap-2 mt-2">
+                <Input
+                  value={newSpec}
+                  onChange={(e) => setNewSpec(e.target.value)}
+                  placeholder="Add technical specification..."
+                  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addTechnicalSpec())}
+                />
+                <Button type="button" onClick={addTechnicalSpec} size="sm">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              {formData.technicalSpecifications.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {formData.technicalSpecifications.map((spec, index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                      {spec}
+                      <X 
+                        className="h-3 w-3 cursor-pointer" 
+                        onClick={() => removeTechnicalSpec(index)}
+                      />
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Certifications */}
+            <div>
+              <Label>Certifications</Label>
+              <div className="flex gap-2 mt-2">
+                <Input
+                  value={newCertification}
+                  onChange={(e) => setNewCertification(e.target.value)}
+                  placeholder="Add certification (e.g., CE, RoHS, FCC)..."
+                  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addCertification())}
+                />
+                <Button type="button" onClick={addCertification} size="sm">
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              {formData.certifications.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {formData.certifications.map((cert, index) => (
+                    <Badge key={index} variant="outline" className="flex items-center gap-1">
+                      {cert}
+                      <X 
+                        className="h-3 w-3 cursor-pointer" 
+                        onClick={() => removeCertification(index)}
+                      />
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <Label>Product Images</Label>
+            <FileUpload onFilesUploaded={handleFileUpload} accept="image/*" />
+            {formData.images.length > 0 && (
+              <div className="grid grid-cols-4 gap-2 mt-2">
+                {formData.images.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <img 
+                      src={`/uploads/${image}`} 
+                      alt={`Product ${index + 1}`}
+                      className="w-full h-20 object-cover rounded border"
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => removeImage(index)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Settings */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isPublished"
+                checked={formData.isPublished}
+                onCheckedChange={(checked) => handleInputChange("isPublished", checked)}
+              />
+              <Label htmlFor="isPublished">Published</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isFeatured"
+                checked={formData.isFeatured}
+                onCheckedChange={(checked) => handleInputChange("isFeatured", checked)}
+              />
+              <Label htmlFor="isFeatured">Featured</Label>
+            </div>
+          </div>
+
+          {/* Submit Buttons */}
+          <div className="flex justify-end gap-2 pt-4 border-t">
+            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={createMutation.isPending}>
+              {createMutation.isPending ? "Adding..." : "Add Product"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default AddProductModal;

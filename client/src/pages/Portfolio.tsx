@@ -7,6 +7,7 @@ import { ArrowLeft, MapPin, Star } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { PortfolioProject } from "@shared/schema";
+import QuoteModal from "@/components/QuoteModal";
 
 // Import fallback images
 import residentialLighting from "@/assets/residential-lighting.jpg";
@@ -175,11 +176,16 @@ const Portfolio = () => {
             Contact us today to discuss your lighting needs and get a custom solution designed just for you.
           </p>
           <div className="flex justify-center gap-4">
-            <Button size="lg">
-              Get Free Consultation
-            </Button>
-            <Button variant="outline" size="lg">
-              Call Us Now
+            <QuoteModal 
+              trigger={
+                <Button size="lg">
+                  Get Free Consultation
+                </Button>
+              }
+              type="consultation" 
+            />
+            <Button variant="outline" size="lg" asChild>
+              <a href="tel:+1234567890">Call Us Now</a>
             </Button>
           </div>
         </div>
