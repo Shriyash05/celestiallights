@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Phone, Mail, MapPin, Clock, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 const ContactSection = () => {
   const { toast } = useToast();
@@ -17,21 +18,47 @@ const ContactSection = () => {
     projectType: "",
     message: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Quote Request Submitted",
-      description: "Thank you for your interest! We'll contact you within 24 hours.",
-    });
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      projectType: "",
-      message: ""
-    });
+    setIsSubmitting(true);
+    
+    try {
+      await apiRequest('/api/send-quote-email', {
+        method: 'POST',
+        body: JSON.stringify({
+          customerName: formData.name,
+          customerEmail: formData.email,
+          projectType: formData.projectType || 'General inquiry',
+          phone: formData.phone,
+          company: formData.company,
+          message: formData.message
+        }),
+      });
+      
+      toast({
+        title: "Quote Request Submitted",
+        description: "Thank you for your interest! We'll contact you within 24 hours.",
+      });
+      
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        company: "",
+        projectType: "",
+        message: ""
+      });
+    } catch (error) {
+      toast({
+        title: "Error submitting request",
+        description: "Please try again or contact us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

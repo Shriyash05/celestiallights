@@ -4,6 +4,8 @@
 
 This is a full-stack web application for Celestial Lights, a premium LED and architectural lighting company. The application serves as both a marketing website and content management system, showcasing the company's portfolio projects and products with an admin interface for content management.
 
+**Migration Status**: Successfully migrated from Replit Agent to standard Replit environment with PostgreSQL database and free email functionality.
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.

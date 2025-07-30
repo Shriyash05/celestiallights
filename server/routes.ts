@@ -166,6 +166,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Auth API
+  app.post("/api/auth/signin", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+      
+      // Check if user exists and validate credentials
+      const profile = await storage.getProfileByEmail(email);
+      
+      // For security, check if it's an admin email and password matches expected
+      const adminCredentials = [
+        { email: 'admin@celestiallights.com', password: 'admin123' },
+        { email: 'info.celestiallight@gmail.com', password: 'celestial2024' }
+      ];
+      
+      const validAdmin = adminCredentials.find(
+        cred => cred.email === email && cred.password === password
+      );
+      
+      if (!validAdmin) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+      
+      // Create or update admin profile if doesn't exist
+      if (!profile) {
+        await storage.createProfile({
+          id: `admin-${Date.now()}`,
+          email,
+          role: 'admin'
+        });
+      }
+      
+      res.json({ 
+        user: { id: profile?.id || `admin-${Date.now()}`, email },
+        isAdmin: true 
+      });
+    } catch (error) {
+      console.error("Error during signin:", error);
+      res.status(500).json({ error: "Authentication failed" });
+    }
+  });
+
   app.post("/api/auth/check-admin", async (req, res) => {
     try {
       const { email } = req.body;
@@ -173,7 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email is required" });
       }
       
-      // For now, check if profile exists and has admin role
+      // Check if profile exists and has admin role
       const profile = await storage.getProfileByEmail(email);
       const isAdmin = profile?.role === "admin";
       
@@ -203,7 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
         const nodemailer = await import('nodemailer');
         
-        const transporter = nodemailer.createTransporter({
+        const transporter = nodemailer.createTransport({
           host: process.env.SMTP_HOST,
           port: parseInt(process.env.SMTP_PORT || '587'),
           secure: process.env.SMTP_SECURE === 'true',

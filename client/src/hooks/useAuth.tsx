@@ -38,34 +38,29 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const signIn = async (email: string, password: string) => {
     setLoading(true);
     try {
-      // For demo purposes, we'll simulate authentication
-      // In a real app, you'd call your authentication API
-      const adminEmails = ['admin@celestiallights.com', 'info.celestiallight@gmail.com'];
-      const isAdminUser = adminEmails.includes(email);
-      
-      if (email && password) {
-        // Check admin status via API
-        const { isAdmin: apiIsAdmin } = await apiRequest('/api/auth/check-admin', {
-          method: 'POST',
-          body: JSON.stringify({ email }),
-        });
-        
-        setUser({ id: '1', email });
-        setIsAdmin(apiIsAdmin || isAdminUser);
-        
-        toast({
-          title: "Welcome back!",
-          description: "You have successfully signed in.",
-        });
-        
-        return { error: null };
-      } else {
+      if (!email || !password) {
         throw new Error('Email and password are required');
       }
+
+      // Call the real authentication API
+      const response = await apiRequest('/api/auth/signin', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      });
+      
+      setUser(response.user);
+      setIsAdmin(response.isAdmin);
+      
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
+      });
+      
+      return { error: null };
     } catch (error: any) {
       toast({
         title: "Error signing in",
-        description: error.message || 'Authentication failed',
+        description: error.message || 'Invalid credentials',
         variant: "destructive",
       });
       return { error };

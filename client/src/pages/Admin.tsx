@@ -29,8 +29,8 @@ const projectSchema = z.object({
   features: z.string().min(1, 'Features are required'),
   imageUrl: z.string().optional(),
   videoUrl: z.string().optional(),
-  images: z.array(z.string()).optional(),
-  videos: z.array(z.string()).optional(),
+  images: z.array(z.string()).default([]),
+  videos: z.array(z.string()).default([]),
   isPublished: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
 });
@@ -41,7 +41,7 @@ const productSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   technicalSpecifications: z.string().min(1, 'Technical specifications are required'),
   imageUrl: z.string().optional(),
-  images: z.array(z.string()).optional(),
+  images: z.array(z.string()).default([]),
   isPublished: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
 });
@@ -55,11 +55,11 @@ const Admin = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   // Use TanStack Query for data fetching
-  const { data: projects = [], isLoading: projectsLoading } = useQuery({
+  const { data: projects = [], isLoading: projectsLoading } = useQuery<PortfolioProject[]>({
     queryKey: ['/api/portfolio-projects'],
   });
 
-  const { data: products = [], isLoading: productsLoading } = useQuery({
+  const { data: products = [], isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: ['/api/products'],
   });
 
@@ -97,6 +97,33 @@ const Admin = () => {
     },
     onError: () => {
       toast({ title: 'Failed to create product', variant: 'destructive' });
+    },
+  });
+
+  // Delete mutations
+  const deleteProjectMutation = useMutation({
+    mutationFn: (id: string) => apiRequest(`/api/portfolio-projects/${id}`, {
+      method: 'DELETE',
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/portfolio-projects'] });
+      toast({ title: 'Project deleted successfully' });
+    },
+    onError: () => {
+      toast({ title: 'Failed to delete project', variant: 'destructive' });
+    },
+  });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: (id: string) => apiRequest(`/api/products/${id}`, {
+      method: 'DELETE',
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      toast({ title: 'Product deleted successfully' });
+    },
+    onError: () => {
+      toast({ title: 'Failed to delete product', variant: 'destructive' });
     },
   });
 
@@ -268,12 +295,11 @@ const Admin = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          // Delete functionality would go here
-                          toast({
-                            title: "Delete functionality",
-                            description: "Delete functionality needs to be implemented",
-                          });
+                          if (confirm('Are you sure you want to delete this project?')) {
+                            deleteProjectMutation.mutate(project.id);
+                          }
                         }}
+                        disabled={deleteProjectMutation.isPending}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -340,12 +366,11 @@ const Admin = () => {
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          // Delete functionality would go here
-                          toast({
-                            title: "Delete functionality",
-                            description: "Delete functionality needs to be implemented",
-                          });
+                          if (confirm('Are you sure you want to delete this product?')) {
+                            deleteProductMutation.mutate(product.id);
+                          }
                         }}
+                        disabled={deleteProductMutation.isPending}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
