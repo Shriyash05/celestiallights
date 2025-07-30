@@ -114,7 +114,7 @@ const Portfolio = () => {
                     alt={project.title}
                     className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  {project.is_featured && (
+                  {project.isFeatured && (
                     <div className="absolute top-4 right-4">
                       <Badge variant="secondary" className="bg-primary/90 text-primary-foreground">
                         <Star className="w-3 h-3 mr-1 fill-current" />

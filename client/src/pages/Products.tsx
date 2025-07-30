@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, Star, ShoppingCart } from 'lucide-react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,13 +13,14 @@ const Products = () => {
   const [activeFilter, setActiveFilter] = useState('All');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [, setLocation] = useLocation();
 
   const { data: products = [], isLoading: loading } = useQuery<Product[]>({
     queryKey: ["/api/products"],
   });
 
   const getProductImage = (product: Product) => {
-    if (product.image_url) return product.image_url;
+    if (product.imageUrl) return product.imageUrl;
     
     // Fallback images based on category
     const fallbackImages = {
@@ -82,7 +83,7 @@ const Products = () => {
           <Button 
             variant="ghost" 
             size="sm"
-            onClick={() => navigate('/')}
+            onClick={() => setLocation('/')}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Home
@@ -135,7 +136,7 @@ const Products = () => {
                     alt={product.title}
                     className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  {product.is_featured && (
+                  {product.isFeatured && (
                     <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
                       <Star className="h-3 w-3 mr-1" />
                       Featured
@@ -160,14 +161,14 @@ const Products = () => {
                   </p>
                   
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {(product.technical_specifications || []).slice(0, 3).map((spec, index) => (
+                    {(product.technicalSpecifications || []).slice(0, 3).map((spec: string, index: number) => (
                       <Badge key={index} variant="outline" className="text-xs">
                         {spec}
                       </Badge>
                     ))}
-                    {(product.technical_specifications || []).length > 3 && (
+                    {(product.technicalSpecifications || []).length > 3 && (
                       <Badge variant="outline" className="text-xs">
-                        +{(product.technical_specifications || []).length - 3} more
+                        +{(product.technicalSpecifications || []).length - 3} more
                       </Badge>
                     )}
                   </div>
