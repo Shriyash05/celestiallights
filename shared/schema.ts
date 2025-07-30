@@ -27,6 +27,7 @@ export const portfolioProjects = pgTable("portfolio_projects", {
   imageUrl: text("image_url"),
   images: text("images").array().default([]),
   videoUrl: text("video_url"),
+  videos: text("videos").array().default([]),
   isPublished: boolean("is_published").default(true),
   isFeatured: boolean("is_featured").default(false),
   createdAt: timestamp("created_at").defaultNow(),

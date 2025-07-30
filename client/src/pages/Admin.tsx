@@ -17,6 +17,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { FileUpload } from '@/components/FileUpload';
 import type { PortfolioProject, Product } from '@shared/schema';
 
 // Form schemas
@@ -28,6 +29,8 @@ const projectSchema = z.object({
   features: z.string().min(1, 'Features are required'),
   imageUrl: z.string().optional(),
   videoUrl: z.string().optional(),
+  images: z.array(z.string()).optional(),
+  videos: z.array(z.string()).optional(),
   isPublished: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
 });
@@ -38,6 +41,7 @@ const productSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   technicalSpecifications: z.string().min(1, 'Technical specifications are required'),
   imageUrl: z.string().optional(),
+  images: z.array(z.string()).optional(),
   isPublished: z.boolean().default(true),
   isFeatured: z.boolean().default(false),
 });
@@ -107,6 +111,8 @@ const Admin = () => {
       features: '',
       imageUrl: '',
       videoUrl: '',
+      images: [],
+      videos: [],
       isPublished: true,
       isFeatured: false,
     },
@@ -120,17 +126,49 @@ const Admin = () => {
       description: '',
       technicalSpecifications: '',
       imageUrl: '',
+      images: [],
       isPublished: true,
       isFeatured: false,
     },
   });
 
   const onSubmitProject = (data: any) => {
+    // Set main image URL from uploaded images if not manually provided
+    if (!data.imageUrl && data.images && data.images.length > 0) {
+      data.imageUrl = data.images[0];
+    }
+    // Set main video URL from uploaded videos if not manually provided
+    if (!data.videoUrl && data.videos && data.videos.length > 0) {
+      data.videoUrl = data.videos[0];
+    }
     createProjectMutation.mutate(data);
   };
 
   const onSubmitProduct = (data: any) => {
+    // Set main image URL from uploaded images if not manually provided
+    if (!data.imageUrl && data.images && data.images.length > 0) {
+      data.imageUrl = data.images[0];
+    }
     createProductMutation.mutate(data);
+  };
+
+  // Handle file uploads
+  const handleProjectFilesUploaded = (files: any[]) => {
+    const images = files.filter(f => f.mimetype.startsWith('image/')).map(f => f.url);
+    const videos = files.filter(f => f.mimetype.startsWith('video/')).map(f => f.url);
+    
+    const currentImages = projectForm.getValues('images') || [];
+    const currentVideos = projectForm.getValues('videos') || [];
+    
+    projectForm.setValue('images', [...currentImages, ...images]);
+    projectForm.setValue('videos', [...currentVideos, ...videos]);
+  };
+
+  const handleProductFilesUploaded = (files: any[]) => {
+    const images = files.filter(f => f.mimetype.startsWith('image/')).map(f => f.url);
+    
+    const currentImages = productForm.getValues('images') || [];
+    productForm.setValue('images', [...currentImages, ...images]);
   };
 
   // Redirect if not admin
@@ -425,15 +463,27 @@ const Admin = () => {
                   />
                 </div>
 
+                {/* File Upload Section */}
+                <div className="space-y-4">
+                  <FileUpload
+                    onFilesUploaded={handleProjectFilesUploaded}
+                    accept="image/*,video/*"
+                    maxFiles={10}
+                    multiple={true}
+                    label="Upload Project Images & Videos"
+                  />
+                </div>
+
+                {/* Manual URL inputs (optional) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={projectForm.control}
                     name="imageUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Image URL</FormLabel>
+                        <FormLabel>Main Image URL (optional)</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="https://..." />
+                          <Input {...field} placeholder="https://... or leave blank to use first uploaded image" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -445,9 +495,9 @@ const Admin = () => {
                     name="videoUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Video URL</FormLabel>
+                        <FormLabel>Main Video URL (optional)</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="https://..." />
+                          <Input {...field} placeholder="https://... or leave blank to use first uploaded video" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -587,14 +637,25 @@ const Admin = () => {
                   )}
                 />
 
+                {/* File Upload Section */}
+                <div className="space-y-4">
+                  <FileUpload
+                    onFilesUploaded={handleProductFilesUploaded}
+                    accept="image/*"
+                    maxFiles={5}
+                    multiple={true}
+                    label="Upload Product Images"
+                  />
+                </div>
+
                 <FormField
                   control={productForm.control}
                   name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image URL</FormLabel>
+                      <FormLabel>Main Image URL (optional)</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="https://..." />
+                        <Input {...field} placeholder="https://... or leave blank to use first uploaded image" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

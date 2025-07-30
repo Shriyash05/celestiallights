@@ -3,8 +3,32 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertPortfolioProjectSchema, insertProductSchema, insertProfileSchema } from "@shared/schema";
 import { z } from "zod";
+import { uploadMultiple } from "./upload";
+import path from "path";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // File Upload API
+  app.post("/api/upload", uploadMultiple, (req, res) => {
+    try {
+      if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
+        return res.status(400).json({ error: "No files uploaded" });
+      }
+
+      const fileUrls = req.files.map((file: Express.Multer.File) => ({
+        filename: file.filename,
+        originalName: file.originalname,
+        url: `/uploads/${file.filename}`,
+        size: file.size,
+        mimetype: file.mimetype,
+      }));
+
+      res.json({ files: fileUrls });
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      res.status(500).json({ error: "Failed to upload files" });
+    }
+  });
+
   // Portfolio Projects API
   app.get("/api/portfolio-projects", async (req, res) => {
     try {
