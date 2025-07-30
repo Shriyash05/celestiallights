@@ -87,6 +87,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/portfolio-projects/:id", async (req, res) => {
+    try {
+      const project = await storage.updatePortfolioProject(req.params.id, req.body);
+      res.json(project);
+    } catch (error) {
+      console.error("Error updating portfolio project:", error);
+      res.status(500).json({ error: "Failed to update portfolio project" });
+    }
+  });
+
   app.delete("/api/portfolio-projects/:id", async (req, res) => {
     try {
       await storage.deletePortfolioProject(req.params.id);
@@ -146,6 +156,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.patch("/api/products/:id", async (req, res) => {
+    try {
+      const product = await storage.updateProduct(req.params.id, req.body);
+      res.json(product);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      res.status(500).json({ error: "Failed to update product" });
+    }
+  });
+
+  app.put("/api/products/:id", async (req, res) => {
     try {
       const product = await storage.updateProduct(req.params.id, req.body);
       res.json(product);

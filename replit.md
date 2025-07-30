@@ -4,7 +4,7 @@
 
 This is a full-stack web application for Celestial Lights, a premium LED and architectural lighting company. The application serves as both a marketing website and content management system, showcasing the company's portfolio projects and products with an admin interface for content management.
 
-**Migration Status**: Successfully migrated from Replit Agent to standard Replit environment with PostgreSQL database and free email functionality.
+**Migration Status**: Successfully migrated to standalone environment with PostgreSQL database and free email functionality, ready for deployment on any hosting provider.
 
 ## User Preferences
 
@@ -40,7 +40,7 @@ Preferred communication style: Simple, everyday language.
 - **Portfolio Section**: Showcase of featured projects with filtering and modal details
 - **Products Section**: Display of featured products with detailed specifications
 - **About Section**: Company history and values presentation
-- **Contact Section**: Contact form and company information
+- **Contact Section**: Contact form with email functionality and company information
 - **Admin Interface**: CRUD operations for portfolio projects and products
 
 ### Backend Components
@@ -73,7 +73,7 @@ Preferred communication style: Simple, everyday language.
 1. Static pages with dynamic content loading
 2. Filtered views for portfolio projects and products
 3. Modal dialogs for detailed content viewing
-4. Contact form submissions (placeholder implementation)
+4. Contact form submissions with email notifications
 
 ## External Dependencies
 
@@ -116,4 +116,10 @@ Preferred communication style: Simple, everyday language.
 - Environment variables for database URL and admin configuration
 - Static file serving capability
 
-The application is designed for easy deployment on platforms like Replit, Vercel, or similar Node.js hosting providers with automatic database provisioning through Neon.
+The application is designed for easy deployment on platforms like GoDaddy, Vercel, DigitalOcean, or similar Node.js hosting providers with PostgreSQL database support.
+
+## Admin Credentials
+- **Email**: admin@celestiallights.com
+- **Password**: admin123
+- **Alternative Email**: info.celestiallight@gmail.com  
+- **Alternative Password**: celestial2024

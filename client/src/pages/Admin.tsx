@@ -76,9 +76,29 @@ const Admin = () => {
       queryClient.invalidateQueries({ queryKey: ['/api/portfolio-projects'] });
       toast({ title: 'Project created successfully' });
       setShowForm(false);
+      setEditingProject(null);
     },
     onError: () => {
       toast({ title: 'Failed to create project', variant: 'destructive' });
+    },
+  });
+
+  const updateProjectMutation = useMutation({
+    mutationFn: (data: any) => apiRequest(`/api/portfolio-projects/${editingProject?.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        ...data,
+        features: data.features.split(',').map((f: string) => f.trim()),
+      }),
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/portfolio-projects'] });
+      toast({ title: 'Project updated successfully' });
+      setShowForm(false);
+      setEditingProject(null);
+    },
+    onError: () => {
+      toast({ title: 'Failed to update project', variant: 'destructive' });
     },
   });
 
@@ -94,9 +114,29 @@ const Admin = () => {
       queryClient.invalidateQueries({ queryKey: ['/api/products'] });
       toast({ title: 'Product created successfully' });
       setShowForm(false);
+      setEditingProduct(null);
     },
     onError: () => {
       toast({ title: 'Failed to create product', variant: 'destructive' });
+    },
+  });
+
+  const updateProductMutation = useMutation({
+    mutationFn: (data: any) => apiRequest(`/api/products/${editingProduct?.id}`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        ...data,
+        technicalSpecifications: data.technicalSpecifications.split(',').map((s: string) => s.trim()),
+      }),
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      toast({ title: 'Product updated successfully' });
+      setShowForm(false);
+      setEditingProduct(null);
+    },
+    onError: () => {
+      toast({ title: 'Failed to update product', variant: 'destructive' });
     },
   });
 
@@ -168,7 +208,12 @@ const Admin = () => {
     if (!data.videoUrl && data.videos && data.videos.length > 0) {
       data.videoUrl = data.videos[0];
     }
-    createProjectMutation.mutate(data);
+    
+    if (editingProject) {
+      updateProjectMutation.mutate(data);
+    } else {
+      createProjectMutation.mutate(data);
+    }
   };
 
   const onSubmitProduct = (data: any) => {
@@ -176,7 +221,12 @@ const Admin = () => {
     if (!data.imageUrl && data.images && data.images.length > 0) {
       data.imageUrl = data.images[0];
     }
-    createProductMutation.mutate(data);
+    
+    if (editingProduct) {
+      updateProductMutation.mutate(data);
+    } else {
+      createProductMutation.mutate(data);
+    }
   };
 
   // Handle file uploads
@@ -287,7 +337,17 @@ const Admin = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setEditingProject(project)}
+                        onClick={() => {
+                          setEditingProject(project);
+                          setShowForm(true);
+                          // Pre-fill form with project data
+                          projectForm.reset({
+                            ...project,
+                            features: project.features.join(', '),
+                            images: project.images || [],
+                            videos: project.videos || []
+                          });
+                        }}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -358,7 +418,16 @@ const Admin = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setEditingProduct(product)}
+                        onClick={() => {
+                          setEditingProduct(product);
+                          setShowForm(true);
+                          // Pre-fill form with product data
+                          productForm.reset({
+                            ...product,
+                            technicalSpecifications: product.technicalSpecifications.join(', '),
+                            images: product.images || []
+                          });
+                        }}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -396,8 +465,14 @@ const Admin = () => {
         {showForm && activeTab === 'projects' && (
           <Card className="mt-6 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Add New Project</h3>
-              <Button variant="outline" size="sm" onClick={() => setShowForm(false)}>
+              <h3 className="text-lg font-semibold">
+                {editingProject ? 'Edit Project' : 'Add New Project'}
+              </h3>
+              <Button variant="outline" size="sm" onClick={() => {
+                setShowForm(false);
+                setEditingProject(null);
+                projectForm.reset();
+              }}>
                 <X className="w-4 h-4" />
               </Button>
             </div>
@@ -569,10 +644,17 @@ const Admin = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createProjectMutation.isPending}>
-                    {createProjectMutation.isPending ? 'Creating...' : 'Create Project'}
+                  <Button type="submit" disabled={createProjectMutation.isPending || updateProjectMutation.isPending}>
+                    {editingProject 
+                      ? (updateProjectMutation.isPending ? 'Updating...' : 'Update Project')
+                      : (createProjectMutation.isPending ? 'Creating...' : 'Create Project')
+                    }
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setShowForm(false);
+                    setEditingProject(null);
+                    projectForm.reset();
+                  }}>
                     Cancel
                   </Button>
                 </div>
@@ -585,8 +667,14 @@ const Admin = () => {
         {showForm && activeTab === 'products' && (
           <Card className="mt-6 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Add New Product</h3>
-              <Button variant="outline" size="sm" onClick={() => setShowForm(false)}>
+              <h3 className="text-lg font-semibold">
+                {editingProduct ? 'Edit Product' : 'Add New Product'}
+              </h3>
+              <Button variant="outline" size="sm" onClick={() => {
+                setShowForm(false);
+                setEditingProduct(null);
+                productForm.reset();
+              }}>
                 <X className="w-4 h-4" />
               </Button>
             </div>
@@ -726,48 +814,22 @@ const Admin = () => {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createProductMutation.isPending}>
-                    {createProductMutation.isPending ? 'Creating...' : 'Create Product'}
+                  <Button type="submit" disabled={createProductMutation.isPending || updateProductMutation.isPending}>
+                    {editingProduct 
+                      ? (updateProductMutation.isPending ? 'Updating...' : 'Update Product')
+                      : (createProductMutation.isPending ? 'Creating...' : 'Create Product')
+                    }
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setShowForm(false);
+                    setEditingProduct(null);
+                    productForm.reset();
+                  }}>
                     Cancel
                   </Button>
                 </div>
               </form>
             </Form>
-          </Card>
-        )}
-
-        {/* Edit modals placeholder */}
-        {editingProject && (
-          <Card className="mt-6 p-6">
-            <h3 className="text-lg font-semibold mb-4">Edit Project: {editingProject.title}</h3>
-            <p className="text-muted-foreground">
-              Edit functionality will be implemented with proper update mutations.
-            </p>
-            <Button 
-              variant="outline" 
-              className="mt-4"
-              onClick={() => setEditingProject(null)}
-            >
-              Close
-            </Button>
-          </Card>
-        )}
-
-        {editingProduct && (
-          <Card className="mt-6 p-6">
-            <h3 className="text-lg font-semibold mb-4">Edit Product: {editingProduct.title}</h3>
-            <p className="text-muted-foreground">
-              Edit functionality will be implemented with proper update mutations.
-            </p>
-            <Button 
-              variant="outline" 
-              className="mt-4"
-              onClick={() => setEditingProduct(null)}
-            >
-              Close
-            </Button>
           </Card>
         )}
       </div>
