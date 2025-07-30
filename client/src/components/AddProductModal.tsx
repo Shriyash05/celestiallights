@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,7 +49,10 @@ const AddProductModal = ({ trigger }: AddProductModalProps) => {
 
   const createMutation = useMutation({
     mutationFn: async (productData: typeof formData) => {
-      return await apiRequest("POST", "/api/products", productData);
+      return await apiRequest("/api/products", {
+        method: "POST",
+        body: JSON.stringify(productData)
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/products"] });
@@ -206,6 +209,9 @@ const AddProductModal = ({ trigger }: AddProductModalProps) => {
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Add New Product</DialogTitle>
+          <DialogDescription>
+            Create a new lighting product with comprehensive technical specifications and images.
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">

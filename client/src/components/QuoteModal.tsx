@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -120,6 +120,11 @@ ${formData.name}`;
             <Mail className="h-5 w-5 text-primary" />
             {type === "quote" ? "Request Quote" : "Schedule Consultation"}
           </DialogTitle>
+          <DialogDescription>
+            {type === "quote" 
+              ? "Get a detailed quote for your lighting project with custom specifications."
+              : "Schedule a free consultation to discuss your lighting needs and explore solutions."}
+          </DialogDescription>
         </DialogHeader>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

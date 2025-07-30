@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,7 +37,10 @@ const AddProjectModal = ({ trigger }: AddProjectModalProps) => {
 
   const createMutation = useMutation({
     mutationFn: async (projectData: typeof formData) => {
-      return await apiRequest("POST", "/api/portfolio-projects", projectData);
+      return await apiRequest("/api/portfolio-projects", {
+        method: "POST",
+        body: JSON.stringify(projectData)
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/portfolio-projects"] });
@@ -140,6 +143,9 @@ const AddProjectModal = ({ trigger }: AddProjectModalProps) => {
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold">Add New Project</DialogTitle>
+          <DialogDescription>
+            Add a new portfolio project with details, features, and media files to showcase your work.
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-6">
