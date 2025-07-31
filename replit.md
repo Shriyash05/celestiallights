@@ -50,6 +50,8 @@ A modern full-stack web application for a professional lighting company featurin
 - Configured for proper client/server separation
 - All dependencies installed and verified
 - Database connection established with Supabase PostgreSQL
+- Fixed UI issues: consistent image display, technical specifications, video playback
+- Resolved type inconsistencies between schema and realtime service
 
 ## Development Notes
 - Server runs on port 5001 to avoid conflicts

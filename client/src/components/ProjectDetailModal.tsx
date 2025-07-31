@@ -185,12 +185,10 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
                   controls
                   className="w-full h-full object-cover"
                   preload="metadata"
-                >
-                  {/* Fallback message */}
-                  <div className="flex items-center justify-center h-full text-muted-foreground">
-                    Your browser does not support the video tag.
-                  </div>
-                </video>
+                />
+                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground pointer-events-none opacity-0">
+                  Your browser does not support the video tag.
+                </div>
               </div>
             </div>
           )}
