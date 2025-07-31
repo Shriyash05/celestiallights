@@ -4,7 +4,7 @@ import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useQuery } from '@tanstack/react-query';
+import { useRealtimeProducts } from '@/lib/realtimeService';
 import type { Product } from '@shared/schema';
 import { Skeleton } from '@/components/ui/skeleton';
 import ProductDetailModal from '@/components/ProductDetailModal';
@@ -16,9 +16,7 @@ const Products = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [, setLocation] = useLocation();
 
-  const { data: products = [], isLoading: loading } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
-  });
+  const { products, loading } = useRealtimeProducts();
 
   const getProductImage = (product: Product) => {
     // Always use the first image from images array if available (consistent main image)

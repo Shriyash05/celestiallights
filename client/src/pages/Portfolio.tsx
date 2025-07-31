@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, MapPin, Star, AlertCircle } from "lucide-react";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useRealtimePortfolioProjects } from '@/lib/realtimeService';
 import type { PortfolioProject } from "@shared/schema";
 import QuoteModal from "@/components/QuoteModal";
 import CallUsButton from "@/components/CallUsButton";
@@ -21,18 +21,7 @@ const Portfolio = () => {
   const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { 
-    data: projects = [], 
-    isLoading: loading, 
-    error,
-    refetch 
-  } = useQuery<PortfolioProject[]>({
-    queryKey: ["/api/portfolio-projects"],
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes (replaced cacheTime)
-  });
+  const { projects, loading } = useRealtimePortfolioProjects();
 
   const getProjectImage = (project: PortfolioProject) => {
     // Use first image from images array if available
@@ -71,33 +60,7 @@ const Portfolio = () => {
     setSelectedProject(null);
   };
 
-  // Error state
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4 max-w-md mx-auto px-4">
-          <AlertCircle className="w-16 h-16 text-destructive mx-auto" />
-          <h2 className="text-2xl font-bold">Unable to Load Portfolio</h2>
-          <p className="text-muted-foreground">
-            We're having trouble loading our portfolio projects. Please try again.
-          </p>
-          <Button onClick={() => refetch()} className="mt-4">
-            Try Again
-          </Button>
-          <Button 
-            variant="ghost" 
-            asChild
-            className="mt-2"
-          >
-            <Link to="/" className="inline-flex items-center">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to home
-            </Link>
-          </Button>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -169,7 +132,7 @@ const Portfolio = () => {
             <p className="text-muted-foreground mb-4">
               We haven't added any projects to our portfolio yet. Check back soon!
             </p>
-            <Button onClick={() => refetch()}>
+            <Button onClick={() => window.location.reload()}>
               Refresh
             </Button>
           </div>

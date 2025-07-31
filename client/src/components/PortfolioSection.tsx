@@ -10,7 +10,7 @@ import commercialImage from "@/assets/commercial-project.jpg";
 import ProjectDetailModal from "./ProjectDetailModal";
 import QuoteModal from "@/components/QuoteModal";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useRealtimePortfolioProjects } from "@/lib/realtimeService";
 
 const PortfolioSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -18,9 +18,7 @@ const PortfolioSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuth();
 
-  const { data: projects = [], isLoading: loading } = useQuery<PortfolioProject[]>({
-    queryKey: ["/api/portfolio-projects"],
-  });
+  const { projects, loading } = useRealtimePortfolioProjects();
 
   // Filter only featured projects for the section
   const featuredProjects = projects?.filter(project => project.isFeatured) || [];
