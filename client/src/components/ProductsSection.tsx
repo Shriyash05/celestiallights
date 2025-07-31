@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
-import type { Product } from '@/lib/realtimeService';
+import type { Product } from '@shared/schema';
 import ProductDetailModal from './ProductDetailModal';
 import CallUsButton from '@/components/CallUsButton';
 import { useRealtimeProducts } from '@/lib/realtimeService';
@@ -19,15 +19,15 @@ const ProductsSection = () => {
   const products = allProducts.filter(product => product.isFeatured).slice(0, 3);
 
   const getProductImage = (product: Product) => {
-    // Use first image from images array if available
+    // Always use the first image from images array if available (consistent main image)
     if (product.images && product.images.length > 0) {
       return product.images[0];
     }
-    // Fallback to imageUrl
+    // Fallback to imageUrl (legacy support)
     if (product.imageUrl) return product.imageUrl;
     
-    // Fallback images based on category
-    const fallbackImages = {
+    // Consistent fallback images based on category (prevent random images)
+    const fallbackImages: Record<string, string> = {
       'Smart Lighting': 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
       'Outdoor Lighting': 'https://images.unsplash.com/photo-1500673922987-e212871fec22?w=800&h=600&fit=crop',
       'Indoor Lighting': 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=800&h=600&fit=crop',
@@ -35,8 +35,7 @@ const ProductsSection = () => {
       'Decorative Lighting': 'https://images.unsplash.com/photo-1485833077593-4278bba3f11f?w=800&h=600&fit=crop'
     };
     
-    return fallbackImages[product.category as keyof typeof fallbackImages] ||
-           'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop';
+    return fallbackImages[product.category] || fallbackImages['Indoor Lighting'];
   };
 
   const handleProductClick = (product: Product) => {
@@ -103,11 +102,11 @@ const ProductsSection = () => {
                 <Card
                   key={product.id}
                   className="group overflow-hidden hover:shadow-lg transition-all duration-300 bg-card cursor-pointer"
-                  onClick={() => handleProductClick(product)}
+                  onClick={() => handleProductClick(product as Product)}
                 >
                   <div className="relative overflow-hidden">
                     <img
-                      src={getProductImage(product)}
+                      src={getProductImage(product as Product)}
                       alt={product.title}
                       className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -140,16 +139,34 @@ const ProductsSection = () => {
                     </p>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {(product.technicalSpecifications || []).slice(0, 2).map((spec: string, index: number) => (
+                      {/* Show key technical specs */}
+                      {product.colorTemperature && (
+                        <Badge variant="outline" className="text-xs">
+                          {product.colorTemperature}
+                        </Badge>
+                      )}
+                      {product.lumensOutput && (
+                        <Badge variant="outline" className="text-xs">
+                          {product.lumensOutput}
+                        </Badge>
+                      )}
+                      {product.ipRating && (
+                        <Badge variant="outline" className="text-xs">
+                          IP{product.ipRating}
+                        </Badge>
+                      )}
+                      {product.powerConsumption && (
+                        <Badge variant="outline" className="text-xs">
+                          {product.powerConsumption}
+                        </Badge>
+                      )}
+                      {/* Fallback to technicalSpecifications if no structured specs */}
+                      {!product.colorTemperature && !product.lumensOutput && !product.ipRating && !product.powerConsumption && 
+                       (product.technicalSpecifications || []).slice(0, 3).map((spec: string, index: number) => (
                         <Badge key={index} variant="outline" className="text-xs">
                           {spec}
                         </Badge>
                       ))}
-                      {(product.technicalSpecifications || []).length > 2 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{(product.technicalSpecifications || []).length - 2} more specs
-                        </Badge>
-                      )}
                     </div>
  
                     <div className="flex items-center justify-between pt-4 border-t border-border/50">

@@ -1,50 +1,11 @@
 import { supabase } from '@/lib/supabaseClient';
 import { useEffect, useState } from 'react';
 
-// Types for our data
-export interface PortfolioProject {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  features: string[];
-  location: string;
-  imageUrl: string | null;
-  images: string[] | null;
-  videoUrl: string | null;
-  videos: string[] | null;
-  isPublished: boolean;
-  isFeatured: boolean;
-  created_at: string; // Changed to match database column name
-  updated_at: string; // Changed to match database column name
-}
+// Import types from schema to ensure consistency
+import type { PortfolioProject as SchemaPortfolioProject, Product as SchemaProduct } from '@shared/schema';
 
-export interface Product {
-  id: string;
-  title: string;
-  category: string;
-  description: string;
-  technicalSpecifications: string[];
-  imageUrl: string | null;
-  images: string[] | null;
-  isPublished: boolean;
-  isFeatured: boolean;
-  created_at: string; // Changed to match database column name
-  updated_at: string; // Changed to match database column name
-  // Technical specification fields
-  dimensions: any | null;
-  bodyColor: string | null;
-  beamAngle: string | null;
-  powerConsumption: string | null;
-  ipRating: string | null;
-  colorTemperature: string | null;
-  lumensOutput: string | null;
-  material: string | null;
-  mountingType: string | null;
-  controlType: string | null;
-  warrantyPeriod: string | null;
-  certifications: string[] | null;
-}
+export type PortfolioProject = SchemaPortfolioProject;
+export type Product = SchemaProduct;
 
 // Hook for real-time portfolio projects
 export const useRealtimePortfolioProjects = () => {

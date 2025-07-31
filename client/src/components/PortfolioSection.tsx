@@ -27,14 +27,14 @@ const PortfolioSection = () => {
   // Non-featured projects only show when logged in
   const nonFeaturedProjects = projects?.filter(project => !project.isFeatured) || [];
 
-  // Fallback images
+  // Get consistent project image (always return the first image to avoid randomness)
   const getProjectImage = (project: PortfolioProject) => {
-    // Use first image from images array if available
+    // Always use the first image from images array if available (consistent main image)
     if (project.images && project.images.length > 0) {
       return project.images[0];
     }
 
-    // Final fallback to default images
+    // Consistent fallback based on category (prevent random images)
     return project.category === 'residential' || project.category === 'hospitality'
       ? residentialImage
       : commercialImage;

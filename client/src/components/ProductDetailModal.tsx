@@ -183,37 +183,37 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
             <div>
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5" />
-                Technical Specifications
+                <span>Technical Specifications</span>
               </h3>
               
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Dimensions */}
-                {product.dimensions && typeof product.dimensions === 'object' && Object.keys(product.dimensions as object).length > 0 && (
+                {product.dimensions && typeof product.dimensions === 'object' && Object.keys(product.dimensions as Record<string, any>).length > 0 && (
                   <div className="space-y-2">
                     <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Dimensions</h4>
                     <div className="space-y-1">
-                      {(product.dimensions as any)?.length && (
+                      {(product.dimensions as Record<string, any>)?.length && (
                         <div className="flex justify-between">
                           <span>Length:</span>
-                          <span className="font-medium">{(product.dimensions as any).length}</span>
+                          <span className="font-medium">{String((product.dimensions as Record<string, any>).length)}</span>
                         </div>
                       )}
-                      {(product.dimensions as any)?.width && (
+                      {(product.dimensions as Record<string, any>)?.width && (
                         <div className="flex justify-between">
                           <span>Width:</span>
-                          <span className="font-medium">{(product.dimensions as any).width}</span>
+                          <span className="font-medium">{String((product.dimensions as Record<string, any>).width)}</span>
                         </div>
                       )}
-                      {(product.dimensions as any)?.height && (
+                      {(product.dimensions as Record<string, any>)?.height && (
                         <div className="flex justify-between">
                           <span>Height:</span>
-                          <span className="font-medium">{(product.dimensions as any).height}</span>
+                          <span className="font-medium">{String((product.dimensions as Record<string, any>).height)}</span>
                         </div>
                       )}
-                      {(product.dimensions as any)?.weight && (
+                      {(product.dimensions as Record<string, any>)?.weight && (
                         <div className="flex justify-between">
                           <span>Weight:</span>
-                          <span className="font-medium">{(product.dimensions as any).weight}</span>
+                          <span className="font-medium">{String((product.dimensions as Record<string, any>).weight)}</span>
                         </div>
                       )}
                     </div>
