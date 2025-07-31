@@ -41,10 +41,8 @@ const PortfolioSection = () => {
   };
 
   const handleProjectClick = (project: PortfolioProject) => {
-    console.log('Portfolio project clicked:', project.title);
     setSelectedProject(project);
     setIsModalOpen(true);
-    console.log('Modal state set to:', true);
   };
 
   const closeModal = () => {

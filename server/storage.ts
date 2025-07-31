@@ -8,7 +8,7 @@ import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
 
 // Define types for selected columns to match query results
-type SelectedPortfolioProject = Pick<PortfolioProject, 'id' | 'title' | 'category' | 'description' | 'location' | 'isPublished' | 'isFeatured' | 'createdAt' | 'updatedAt' | 'videoUrl' | 'images'>;
+type SelectedPortfolioProject = Pick<PortfolioProject, 'id' | 'title' | 'category' | 'description' | 'features' | 'location' | 'isPublished' | 'isFeatured' | 'createdAt' | 'updatedAt' | 'videoUrl' | 'images'>;
 type SelectedProduct = Pick<Product, 'id' | 'title' | 'category' | 'description' | 'isPublished' | 'isFeatured' | 'createdAt' | 'updatedAt' | 'imageUrl' | 'technicalSpecifications'>;
 
 export interface IStorage {
@@ -97,6 +97,7 @@ export class DatabaseStorage implements IStorage {
       title: portfolioProjects.title,
       category: portfolioProjects.category,
       description: portfolioProjects.description,
+      features: portfolioProjects.features,
       location: portfolioProjects.location,
       isPublished: portfolioProjects.isPublished,
       isFeatured: portfolioProjects.isFeatured,
@@ -113,6 +114,7 @@ export class DatabaseStorage implements IStorage {
       title: portfolioProjects.title,
       category: portfolioProjects.category,
       description: portfolioProjects.description,
+      features: portfolioProjects.features,
       location: portfolioProjects.location,
       isPublished: portfolioProjects.isPublished,
       isFeatured: portfolioProjects.isFeatured,
@@ -131,6 +133,7 @@ export class DatabaseStorage implements IStorage {
       title: portfolioProjects.title,
       category: portfolioProjects.category,
       description: portfolioProjects.description,
+      features: portfolioProjects.features,
       location: portfolioProjects.location,
       isPublished: portfolioProjects.isPublished,
       isFeatured: portfolioProjects.isFeatured,
@@ -149,6 +152,7 @@ export class DatabaseStorage implements IStorage {
       title: portfolioProjects.title,
       category: portfolioProjects.category,
       description: portfolioProjects.description,
+      features: portfolioProjects.features,
       location: portfolioProjects.location,
       isPublished: portfolioProjects.isPublished,
       isFeatured: portfolioProjects.isFeatured,

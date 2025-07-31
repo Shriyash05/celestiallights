@@ -1,0 +1,110 @@
+ProjectDetailModal: No project provided
+Portfolio.tsx:65 Portfolio page project clicked: SDFSDF
+Portfolio.tsx:68 Modal state set to: true
+ProjectDetailModal.tsx:62 ProjectDetailModal render: {isOpen: true, projectTitle: 'SDFSDF'}
+ProjectDetailModal.tsx:62 ProjectDetailModal render: {isOpen: true, projectTitle: 'SDFSDF'}
+ProjectDetailModal.tsx:208 Uncaught TypeError: Cannot read properties of undefined (reading 'map')
+    at ProjectDetailModal (ProjectDetailModal.tsx:208:35)
+    at renderWithHooks (chunk-UPELNCPK.js?v=e91e3736:11548:26)
+    at updateFunctionComponent (chunk-UPELNCPK.js?v=e91e3736:14582:28)
+    at beginWork (chunk-UPELNCPK.js?v=e91e3736:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-UPELNCPK.js?v=e91e3736:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-UPELNCPK.js?v=e91e3736:3699:24)
+    at invokeGuardedCallback (chunk-UPELNCPK.js?v=e91e3736:3733:39)
+    at beginWork$1 (chunk-UPELNCPK.js?v=e91e3736:19765:15)
+    at performUnitOfWork (chunk-UPELNCPK.js?v=e91e3736:19198:20)
+    at workLoopSync (chunk-UPELNCPK.js?v=e91e3736:19137:13)
+ProjectDetailModal @ ProjectDetailModal.tsx:208
+renderWithHooks @ chunk-UPELNCPK.js?v=e91e3736:11548
+updateFunctionComponent @ chunk-UPELNCPK.js?v=e91e3736:14582
+beginWork @ chunk-UPELNCPK.js?v=e91e3736:15924
+callCallback2 @ chunk-UPELNCPK.js?v=e91e3736:3674
+invokeGuardedCallbackDev @ chunk-UPELNCPK.js?v=e91e3736:3699
+invokeGuardedCallback @ chunk-UPELNCPK.js?v=e91e3736:3733
+beginWork$1 @ chunk-UPELNCPK.js?v=e91e3736:19765
+performUnitOfWork @ chunk-UPELNCPK.js?v=e91e3736:19198
+workLoopSync @ chunk-UPELNCPK.js?v=e91e3736:19137
+renderRootSync @ chunk-UPELNCPK.js?v=e91e3736:19116
+performSyncWorkOnRoot @ chunk-UPELNCPK.js?v=e91e3736:18874
+flushSyncCallbacks @ chunk-UPELNCPK.js?v=e91e3736:9119
+(anonymous) @ chunk-UPELNCPK.js?v=e91e3736:18627Understand this error
+ProjectDetailModal.tsx:62 ProjectDetailModal render: {isOpen: true, projectTitle: 'SDFSDF'}
+ProjectDetailModal.tsx:62 ProjectDetailModal render: {isOpen: true, projectTitle: 'SDFSDF'}
+ProjectDetailModal.tsx:208 Uncaught TypeError: Cannot read properties of undefined (reading 'map')
+    at ProjectDetailModal (ProjectDetailModal.tsx:208:35)
+    at renderWithHooks (chunk-UPELNCPK.js?v=e91e3736:11548:26)
+    at updateFunctionComponent (chunk-UPELNCPK.js?v=e91e3736:14582:28)
+    at beginWork (chunk-UPELNCPK.js?v=e91e3736:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-UPELNCPK.js?v=e91e3736:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-UPELNCPK.js?v=e91e3736:3699:24)
+    at invokeGuardedCallback (chunk-UPELNCPK.js?v=e91e3736:3733:39)
+    at beginWork$1 (chunk-UPELNCPK.js?v=e91e3736:19765:15)
+    at performUnitOfWork (chunk-UPELNCPK.js?v=e91e3736:19198:20)
+    at workLoopSync (chunk-UPELNCPK.js?v=e91e3736:19137:13)
+ProjectDetailModal @ ProjectDetailModal.tsx:208
+renderWithHooks @ chunk-UPELNCPK.js?v=e91e3736:11548
+updateFunctionComponent @ chunk-UPELNCPK.js?v=e91e3736:14582
+beginWork @ chunk-UPELNCPK.js?v=e91e3736:15924
+callCallback2 @ chunk-UPELNCPK.js?v=e91e3736:3674
+invokeGuardedCallbackDev @ chunk-UPELNCPK.js?v=e91e3736:3699
+invokeGuardedCallback @ chunk-UPELNCPK.js?v=e91e3736:3733
+beginWork$1 @ chunk-UPELNCPK.js?v=e91e3736:19765
+performUnitOfWork @ chunk-UPELNCPK.js?v=e91e3736:19198
+workLoopSync @ chunk-UPELNCPK.js?v=e91e3736:19137
+renderRootSync @ chunk-UPELNCPK.js?v=e91e3736:19116
+recoverFromConcurrentError @ chunk-UPELNCPK.js?v=e91e3736:18736
+performSyncWorkOnRoot @ chunk-UPELNCPK.js?v=e91e3736:18879
+flushSyncCallbacks @ chunk-UPELNCPK.js?v=e91e3736:9119
+(anonymous) @ chunk-UPELNCPK.js?v=e91e3736:18627Understand this error
+chunk-UPELNCPK.js?v=e91e3736:14032 The above error occurred in the <ProjectDetailModal> component:
+
+    at ProjectDetailModal (https://39050550-5b6f-4516-bd09-763d62b70a06-00-1rfkq2t01f4l3.spock.replit.dev/src/components/ProjectDetailModal.tsx:23:31)
+    at div
+    at Portfolio (https://39050550-5b6f-4516-bd09-763d62b70a06-00-1rfkq2t01f4l3.spock.replit.dev/src/pages/Portfolio.tsx:34:43)
+    at Route (https://39050550-5b6f-4516-bd09-763d62b70a06-00-1rfkq2t01f4l3.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e91e3736:323:16)
+    at Switch (https://39050550-5b6f-4516-bd09-763d62b70a06-00-1rfkq2t01f4l3.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e91e3736:379:17)
+    at Router (https://39050550-5b6f-4516-bd09-763d62b70a06-00-1rfkq2t01f4l3.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=e91e3736:291:17)
+    at Provider (https://39050550-5b6f-4516-bd09-763d62b70a06-00-1rfkq2t01f4l3.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-XQEDPT7K.js?v=e91e3736:38:15)
+    at TooltipProvider (https://39050550-5b6f-4516-bd09-763d62b70a06-00-1rfkq2t01f4l3.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=e91e3736:59:5)
+    at AuthProvider (https://39050550-5b6f-4516-bd09-763d62b70a06-00-1rfkq2t01f4l3.spock.replit.dev/src/hooks/useAuth.tsx:31:32)
+    at QueryClientProvider (https://39050550-5b6f-4516-bd09-763d62b70a06-00-1rfkq2t01f4l3.spock.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e91e3736:2805:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-UPELNCPK.js?v=e91e3736:14032
+update.callback @ chunk-UPELNCPK.js?v=e91e3736:14052
+callCallback @ chunk-UPELNCPK.js?v=e91e3736:11248
+commitUpdateQueue @ chunk-UPELNCPK.js?v=e91e3736:11265
+commitLayoutEffectOnFiber @ chunk-UPELNCPK.js?v=e91e3736:17093
+commitLayoutMountEffects_complete @ chunk-UPELNCPK.js?v=e91e3736:17980
+commitLayoutEffects_begin @ chunk-UPELNCPK.js?v=e91e3736:17969
+commitLayoutEffects @ chunk-UPELNCPK.js?v=e91e3736:17920
+commitRootImpl @ chunk-UPELNCPK.js?v=e91e3736:19353
+commitRoot @ chunk-UPELNCPK.js?v=e91e3736:19277
+performSyncWorkOnRoot @ chunk-UPELNCPK.js?v=e91e3736:18895
+flushSyncCallbacks @ chunk-UPELNCPK.js?v=e91e3736:9119
+(anonymous) @ chunk-UPELNCPK.js?v=e91e3736:18627Understand this error
+chunk-UPELNCPK.js?v=e91e3736:9129 Uncaught TypeError: Cannot read properties of undefined (reading 'map')
+    at ProjectDetailModal (ProjectDetailModal.tsx:208:35)
+    at renderWithHooks (chunk-UPELNCPK.js?v=e91e3736:11548:26)
+    at updateFunctionComponent (chunk-UPELNCPK.js?v=e91e3736:14582:28)
+    at beginWork (chunk-UPELNCPK.js?v=e91e3736:15924:22)
+    at beginWork$1 (chunk-UPELNCPK.js?v=e91e3736:19753:22)
+    at performUnitOfWork (chunk-UPELNCPK.js?v=e91e3736:19198:20)
+    at workLoopSync (chunk-UPELNCPK.js?v=e91e3736:19137:13)
+    at renderRootSync (chunk-UPELNCPK.js?v=e91e3736:19116:15)
+    at recoverFromConcurrentError (chunk-UPELNCPK.js?v=e91e3736:18736:28)
+    at performSyncWorkOnRoot (chunk-UPELNCPK.js?v=e91e3736:18879:28)
+ProjectDetailModal @ ProjectDetailModal.tsx:208
+renderWithHooks @ chunk-UPELNCPK.js?v=e91e3736:11548
+updateFunctionComponent @ chunk-UPELNCPK.js?v=e91e3736:14582
+beginWork @ chunk-UPELNCPK.js?v=e91e3736:15924
+beginWork$1 @ chunk-UPELNCPK.js?v=e91e3736:19753
+performUnitOfWork @ chunk-UPELNCPK.js?v=e91e3736:19198
+workLoopSync @ chunk-UPELNCPK.js?v=e91e3736:19137
+renderRootSync @ chunk-UPELNCPK.js?v=e91e3736:19116
+recoverFromConcurrentError @ chunk-UPELNCPK.js?v=e91e3736:18736
+performSyncWorkOnRoot @ chunk-UPELNCPK.js?v=e91e3736:18879
+flushSyncCallbacks @ chunk-UPELNCPK.js?v=e91e3736:9119
+(anonymous) @ chunk-UPELNCPK.js?v=e91e3736:18627Understand this error

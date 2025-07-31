@@ -55,11 +55,10 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
   };
 
   if (!project) {
-    console.log('ProjectDetailModal: No project provided');
     return null;
   }
 
-  console.log('ProjectDetailModal render:', { isOpen, projectTitle: project.title });
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -202,16 +201,18 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
               </DialogDescription>
             </div>
 
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Key Features</h3>
-              <div className="flex flex-wrap gap-2">
-                {project.features.map((feature, index) => (
-                  <Badge key={index} variant="outline" className="px-3 py-1">
-                    {feature}
-                  </Badge>
-                ))}
+            {project.features && project.features.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Key Features</h3>
+                <div className="flex flex-wrap gap-2">
+                  {project.features.map((feature, index) => (
+                    <Badge key={index} variant="outline" className="px-3 py-1">
+                      {feature}
+                    </Badge>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="flex items-center gap-4 pt-4 border-t">
               <div className="flex items-center gap-2">
