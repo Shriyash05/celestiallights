@@ -54,7 +54,12 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
     setIsPlaying(!isPlaying);
   };
 
-  if (!project) return null;
+  if (!project) {
+    console.log('ProjectDetailModal: No project provided');
+    return null;
+  }
+
+  console.log('ProjectDetailModal render:', { isOpen, projectTitle: project.title });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

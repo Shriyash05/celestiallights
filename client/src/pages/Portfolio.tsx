@@ -62,8 +62,10 @@ const Portfolio = () => {
   const categories = ["all", ...Array.from(new Set(projects.map((p: PortfolioProject) => p.category)))];
 
   const handleProjectClick = (project: PortfolioProject) => {
+    console.log('Portfolio page project clicked:', project.title);
     setSelectedProject(project);
     setIsModalOpen(true);
+    console.log('Modal state set to:', true);
   };
 
   const closeModal = () => {
