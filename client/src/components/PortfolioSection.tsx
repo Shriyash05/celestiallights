@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Filter, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
-import type { PortfolioProject } from "@/lib/realtimeService";
+import type { PortfolioProject } from "@shared/schema";
 import residentialImage from "@/assets/residential-lighting.jpg";
 import commercialImage from "@/assets/commercial-project.jpg";
 import ProjectDetailModal from "./ProjectDetailModal";
 import QuoteModal from "@/components/QuoteModal";
 import { useAuth } from "@/hooks/useAuth";
-import { useRealtimePortfolioProjects } from "@/lib/realtimeService";
+import { useQuery } from "@tanstack/react-query";
 
 const PortfolioSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -18,12 +18,14 @@ const PortfolioSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuth();
 
-  const { projects, loading } = useRealtimePortfolioProjects();
+  const { data: projects = [], isLoading: loading } = useQuery<PortfolioProject[]>({
+    queryKey: ["/api/portfolio-projects"],
+  });
 
   // Filter only featured projects for the section
-  const featuredProjects = projects.filter(project => project.isFeatured);
+  const featuredProjects = projects?.filter(project => project.isFeatured) || [];
   // Non-featured projects only show when logged in
-  const nonFeaturedProjects = projects.filter(project => !project.isFeatured);
+  const nonFeaturedProjects = projects?.filter(project => !project.isFeatured) || [];
 
   // Fallback images
   const getProjectImage = (project: PortfolioProject) => {
@@ -31,8 +33,7 @@ const PortfolioSection = () => {
     if (project.images && project.images.length > 0) {
       return project.images[0];
     }
-    // Fallback to imageUrl
-    if (project.imageUrl) return project.imageUrl;
+
     // Final fallback to default images
     return project.category === 'residential' || project.category === 'hospitality'
       ? residentialImage
@@ -125,14 +126,14 @@ const PortfolioSection = () => {
                     <p className="text-muted-foreground mb-4 line-clamp-2">{project.description}</p>
                     
                     <div className="flex flex-wrap gap-2">
-                      {project.features.slice(0, 3).map((feature, idx) => (
+                      {project.features?.slice(0, 3).map((feature, idx) => (
                         <Badge key={idx} variant="outline" className="text-xs">
                           {feature}
                         </Badge>
-                      ))}
-                      {project.features.length > 3 && (
+                      )) || []}
+                      {(project.features?.length || 0) > 3 && (
                         <Badge variant="outline" className="text-xs">
-                          +{project.features.length - 3} more
+                          +{(project.features?.length || 0) - 3} more
                         </Badge>
                       )}
                     </div>
@@ -272,14 +273,14 @@ const PortfolioSection = () => {
                   <p className="text-muted-foreground mb-4 line-clamp-2">{project.description}</p>
                   
                   <div className="flex flex-wrap gap-2">
-                    {project.features.slice(0, 3).map((feature, idx) => (
+                    {project.features?.slice(0, 3).map((feature, idx) => (
                       <Badge key={idx} variant="outline" className="text-xs">
                         {feature}
                       </Badge>
-                    ))}
-                    {project.features.length > 3 && (
+                    )) || []}
+                    {(project.features?.length || 0) > 3 && (
                       <Badge variant="outline" className="text-xs">
-                        +{project.features.length - 3} more
+                        +{(project.features?.length || 0) - 3} more
                       </Badge>
                     )}
                   </div>

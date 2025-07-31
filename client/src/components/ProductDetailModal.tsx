@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, X, Zap, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import type { Product } from '@/lib/realtimeService';
+import type { Product } from '@shared/schema';
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -18,8 +18,6 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
 
   const allImages = product?.images && product.images.length > 0 
     ? product.images 
-    : product?.imageUrl 
-    ? [product.imageUrl] 
     : [];
 
   // Slideshow functionality
