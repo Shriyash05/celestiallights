@@ -170,7 +170,7 @@ export const addPortfolioProject = async (project: Omit<PortfolioProject, 'id' |
   const { data, error } = await supabase
     .from('portfolio_projects')
     .insert([{ ...project, id: crypto.randomUUID() }])
-    .select('id') // Only select ID to bypass PostgREST schema cache issues
+    .select('*') // Select all fields to get complete project data including videos
     .single();
 
   if (error) {

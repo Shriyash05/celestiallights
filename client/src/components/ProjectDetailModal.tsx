@@ -176,19 +176,29 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
           )}
 
           {/* Video Section */}
-          {project.videoUrl && (
+          {(project.videoUrl || (project.videos && project.videos.length > 0)) && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Project Video</h3>
               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden">
-                <video
-                  src={project.videoUrl}
-                  controls
-                  className="w-full h-full object-cover"
-                  preload="metadata"
-                />
-                <div className="absolute inset-0 flex items-center justify-center text-muted-foreground pointer-events-none opacity-0">
-                  Your browser does not support the video tag.
-                </div>
+                {project.videoUrl ? (
+                  <video
+                    src={project.videoUrl}
+                    controls
+                    className="w-full h-full object-cover"
+                    preload="metadata"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                ) : project.videos && project.videos.length > 0 ? (
+                  <video
+                    src={project.videos[0]}
+                    controls
+                    className="w-full h-full object-cover"
+                    preload="metadata"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                ) : null}
               </div>
             </div>
           )}
