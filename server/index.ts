@@ -63,7 +63,7 @@ app.use('/uploads', express.static('public/uploads'));
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = 5000;
+  const port = 5001; // Changed from 5000 to 5001 to avoid EADDRINUSE
   server.listen({
     port,
     host: "localhost",

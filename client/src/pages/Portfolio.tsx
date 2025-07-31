@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, MapPin, Star } from "lucide-react";
+import { ArrowLeft, MapPin, Star, AlertCircle } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { PortfolioProject } from "@shared/schema";
@@ -18,8 +18,17 @@ import manufacturing from "@/assets/manufacturing.jpg";
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState("all");
 
-  const { data: projects = [], isLoading: loading, error } = useQuery<PortfolioProject[]>({
+  const { 
+    data: projects = [], 
+    isLoading: loading, 
+    error,
+    refetch 
+  } = useQuery<PortfolioProject[]>({
     queryKey: ["/api/portfolio-projects"],
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const getProjectImage = (project: PortfolioProject) => {
@@ -47,6 +56,34 @@ const Portfolio = () => {
   });
 
   const categories = ["all", ...Array.from(new Set(projects.map((p) => p.category)))];
+
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4 max-w-md mx-auto px-4">
+          <AlertCircle className="w-16 h-16 text-destructive mx-auto" />
+          <h2 className="text-2xl font-bold">Unable to Load Portfolio</h2>
+          <p className="text-muted-foreground">
+            We're having trouble loading our portfolio projects. Please try again.
+          </p>
+          <Button onClick={() => refetch()} className="mt-4">
+            Try Again
+          </Button>
+          <Button 
+            variant="ghost" 
+            asChild
+            className="mt-2"
+          >
+            <Link to="/" className="inline-flex items-center">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to home
+            </Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -78,19 +115,21 @@ const Portfolio = () => {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {/* Filter Buttons */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
-          {categories.map((category) => (
-            <Button
-              key={category}
-              variant={activeFilter === category ? "default" : "outline"}
-              onClick={() => setActiveFilter(category)}
-              className="capitalize"
-            >
-              {category}
-            </Button>
-          ))}
-        </div>
+        {/* Filter Buttons - Only show if we have projects */}
+        {!loading && projects.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-3 mb-12">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={activeFilter === category ? "default" : "outline"}
+                onClick={() => setActiveFilter(category)}
+                className="capitalize"
+              >
+                {category}
+              </Button>
+            ))}
+          </div>
+        )}
 
         {/* Projects Grid */}
         {loading ? (
@@ -110,7 +149,27 @@ const Portfolio = () => {
               </Card>
             ))}
           </div>
-        ) : filteredProjects.length > 0 ? (
+        ) : projects.length === 0 ? (
+          <div className="text-center py-16">
+            <h3 className="text-xl font-semibold mb-2">No Projects Available</h3>
+            <p className="text-muted-foreground mb-4">
+              We haven't added any projects to our portfolio yet. Check back soon!
+            </p>
+            <Button onClick={() => refetch()}>
+              Refresh
+            </Button>
+          </div>
+        ) : filteredProjects.length === 0 ? (
+          <div className="text-center py-16">
+            <h3 className="text-xl font-semibold mb-2">No projects found</h3>
+            <p className="text-muted-foreground mb-4">
+              No projects match the selected category "{activeFilter}".
+            </p>
+            <Button onClick={() => setActiveFilter("all")} variant="outline">
+              Show All Projects
+            </Button>
+          </div>
+        ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProjects.map((project) => (
               <Card key={project.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300">
@@ -119,6 +178,11 @@ const Portfolio = () => {
                     src={getProjectImage(project)}
                     alt={project.title}
                     className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      // Fallback to default image if project image fails
+                      const target = e.target as HTMLImageElement;
+                      target.src = commercialProject;
+                    }}
                   />
                   {project.isFeatured && (
                     <div className="absolute top-4 right-4">
@@ -139,34 +203,35 @@ const Portfolio = () => {
                     {project.title}
                   </h3>
                   <div className="flex items-center text-sm text-muted-foreground mb-3">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    {project.location}
+                    <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                    <span className="truncate">{project.location}</span>
                   </div>
                   <p className="text-muted-foreground mb-4 line-clamp-3">
                     {project.description}
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {project.features.slice(0, 3).map((feature, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {feature}
-                      </Badge>
-                    ))}
-                    {project.features.length > 3 && (
+                    {project.features && project.features.length > 0 ? (
+                      <>
+                        {project.features.slice(0, 3).map((feature, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {feature}
+                          </Badge>
+                        ))}
+                        {project.features.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{project.features.length - 3} more
+                          </Badge>
+                        )}
+                      </>
+                    ) : (
                       <Badge variant="outline" className="text-xs">
-                        +{project.features.length - 3} more
+                        No features listed
                       </Badge>
                     )}
                   </div>
                 </CardContent>
               </Card>
             ))}
-          </div>
-        ) : (
-          <div className="text-center py-16">
-            <h3 className="text-xl font-semibold mb-2">No projects found</h3>
-            <p className="text-muted-foreground">
-              No projects match the selected category.
-            </p>
           </div>
         )}
 
@@ -176,7 +241,7 @@ const Portfolio = () => {
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
             Contact us today to discuss your lighting needs and get a custom solution designed just for you.
           </p>
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center gap-4 flex-wrap">
             <QuoteModal 
               trigger={
                 <Button size="lg">

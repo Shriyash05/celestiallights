@@ -4,13 +4,13 @@
 
 To get the application running quickly, you have a few options:
 
-### Option 1: Use Neon (Recommended - Free)
-1. Go to [neon.tech](https://neon.tech) and create a free account
-2. Create a new PostgreSQL database
-3. Copy the connection string from your dashboard
+### Option 1: Use Supabase (Recommended - Free)
+1. Go to [supabase.com](https://supabase.com) and create a free account
+2. Create a new project
+3. Navigate to Project Settings > Database to get your connection details
 4. Create a `.env` file in the root directory with:
    ```
-   DATABASE_URL="your-neon-connection-string-here"
+   DATABASE_URL="postgresql://[USER]:[PASSWORD]@[HOST]:[PORT]/[DATABASE_NAME]"
    ```
 
 ### Option 2: Use Local PostgreSQL
@@ -21,8 +21,15 @@ To get the application running quickly, you have a few options:
    DATABASE_URL="postgresql://username:password@localhost:5432/celestiallights"
    ```
 
-### Option 3: Use SQLite for Development (Quickest)
-If you want to get started immediately without setting up PostgreSQL, you can modify the database configuration to use SQLite.
+### Option 3: Use Neon (Alternative)
+If you prefer to continue using Neon:
+1. Go to [neon.tech](https://neon.tech) and create a free account
+2. Create a new PostgreSQL database
+3. Copy the connection string from your dashboard
+4. Create a `.env` file in the root directory with:
+   ```
+   DATABASE_URL="your-neon-connection-string-here"
+   ```
 
 ## After Setting Up DATABASE_URL
 
@@ -62,4 +69,4 @@ The application uses these main tables:
 - `portfolio_projects` - Project showcase data
 - `products` - Product catalog
 
-The schema is defined in `shared/schema.ts` and will be automatically created when you run `npm run db:push`. 
+The schema is defined in `shared/schema.ts` and will be automatically created when you run `npm run db:push`.

@@ -1,14 +1,9 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { apiRequest } from '@/lib/queryClient';
-
-interface User {
-  id: string;
-  email: string;
-}
+import { supabase, AuthUser } from '@/lib/supabaseClient';
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
@@ -30,10 +25,63 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const { toast } = useToast();
+
+  // Check active session on mount
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const user = session.user;
+        setUser({
+          id: session.user.id,
+          email: session.user.email || '',
+        });
+        
+        // Check if user is admin
+        const adminEmails = [
+          'admin@celestiallights.com',
+          'info.celestiallight@gmail.com',
+          'shrimhatre00@gmail.com' // Added user's admin email
+        ];
+        setIsAdmin(adminEmails.includes(user.email || ''));
+      }
+      setLoading(false);
+    };
+
+    checkSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session) {
+          const user = session.user;
+          setUser({
+            id: session.user.id,
+            email: session.user.email || '',
+          });
+          
+          // Check if user is admin
+          const adminEmails = [
+            'admin@celestiallights.com',
+            'info.celestiallight@gmail.com',
+            'shrimhatre00@gmail.com' // Added user's admin email
+          ];
+          setIsAdmin(adminEmails.includes(user.email || ''));
+        } else {
+          setUser(null);
+          setIsAdmin(false);
+        }
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     setLoading(true);
@@ -42,20 +90,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         throw new Error('Email and password are required');
       }
 
-      // Call the real authentication API
-      const response = await apiRequest('/api/auth/signin', {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
+      // Sign in with Supabase Auth
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       });
-      
-      setUser(response.user);
-      setIsAdmin(response.isAdmin);
-      
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      const user = data.user;
+      setUser({
+        id: data.user.id,
+        email: data.user.email || '',
+      });
+
+      // Check if user is admin
+      const adminEmails = [
+        'admin@celestiallights.com',
+        'info.celestiallight@gmail.com',
+        'shrimhatre00@gmail.com' // Added user's admin email
+      ];
+      setIsAdmin(adminEmails.includes(user.email || ''));
+
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in.",
       });
-      
+
       return { error: null };
     } catch (error: any) {
       toast({
@@ -70,12 +133,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const signOut = async () => {
-    setUser(null);
-    setIsAdmin(false);
-    toast({
-      title: "Goodbye!",
-      description: "You have successfully signed out.",
-    });
+    const { error } = await supabase.auth.signOut();
+    
+    if (error) {
+      toast({
+        title: "Error signing out",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      setUser(null);
+      setIsAdmin(false);
+      toast({
+        title: "Goodbye!",
+        description: "You have successfully signed out.",
+      });
+    }
   };
 
   const value = {

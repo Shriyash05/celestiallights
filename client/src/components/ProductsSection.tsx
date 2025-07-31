@@ -4,18 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Link } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
-import type { Product } from '@shared/schema';
+import type { Product } from '@/lib/realtimeService';
 import ProductDetailModal from './ProductDetailModal';
 import CallUsButton from '@/components/CallUsButton';
+import { useRealtimeProducts } from '@/lib/realtimeService';
 
 const ProductsSection = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: allProducts = [], isLoading: loading } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
-  });
+  const { products: allProducts = [], loading } = useRealtimeProducts();
 
   // Filter featured products
   const products = allProducts.filter(product => product.isFeatured).slice(0, 3);
@@ -25,7 +23,7 @@ const ProductsSection = () => {
     if (product.images && product.images.length > 0) {
       return product.images[0];
     }
-    // Fallback to imageUrl  
+    // Fallback to imageUrl
     if (product.imageUrl) return product.imageUrl;
     
     // Fallback images based on category
@@ -37,7 +35,7 @@ const ProductsSection = () => {
       'Decorative Lighting': 'https://images.unsplash.com/photo-1485833077593-4278bba3f11f?w=800&h=600&fit=crop'
     };
     
-    return fallbackImages[product.category as keyof typeof fallbackImages] || 
+    return fallbackImages[product.category as keyof typeof fallbackImages] ||
            'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop';
   };
 
@@ -102,8 +100,8 @@ const ProductsSection = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
               {products.map((product) => (
-                <Card 
-                  key={product.id} 
+                <Card
+                  key={product.id}
                   className="group overflow-hidden hover:shadow-lg transition-all duration-300 bg-card cursor-pointer"
                   onClick={() => handleProductClick(product)}
                 >
@@ -153,7 +151,7 @@ const ProductsSection = () => {
                         </Badge>
                       )}
                     </div>
-
+ 
                     <div className="flex items-center justify-between pt-4 border-t border-border/50">
                       <span className="text-sm text-muted-foreground">Click to view details</span>
                       <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
@@ -171,8 +169,8 @@ const ProductsSection = () => {
                     <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <CallUsButton 
-                  variant="outline" 
+                <CallUsButton
+                  variant="outline"
                   size="lg"
                   children="Call Us"
                 />
@@ -183,7 +181,7 @@ const ProductsSection = () => {
       </div>
       
       {selectedProduct && (
-        <ProductDetailModal 
+        <ProductDetailModal
           product={selectedProduct}
           isOpen={isModalOpen}
           onClose={closeModal}

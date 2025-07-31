@@ -12,23 +12,27 @@ import { Link } from 'wouter';
 const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { signIn, user, loading: authLoading } = useAuth();
+  const { signIn, user, loading } = useAuth();
 
-  // Don't redirect - allow non-admin users to access auth page
+  if (loading) {
+    return <div>Loading authentication...</div>; // Or a spinner/loading component
+  }
+
+  // Redirect if already signed in and not loading
+  if (user) {
+    return <Redirect to="/admin" />;
+  }
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     await signIn(email, password);
-    setLoading(false);
   };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />

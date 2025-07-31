@@ -12,28 +12,26 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import type { PortfolioProject, Product } from '@shared/schema';
 import AddProjectModal from '@/components/AddProjectModal';
 import AddProductModal from '@/components/AddProductModal';
+import {
+  useRealtimePortfolioProjects,
+  useRealtimeProducts,
+  deletePortfolioProject,
+  deleteProduct
+} from '@/lib/realtimeService';
 
 const Admin = () => {
   const { user, isAdmin, loading } = useAuth();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<'projects' | 'products'>('projects');
 
-  // Use TanStack Query for data fetching
-  const { data: projects = [], isLoading: projectsLoading } = useQuery<PortfolioProject[]>({
-    queryKey: ['/api/portfolio-projects'],
-  });
-
-  const { data: products = [], isLoading: productsLoading } = useQuery<Product[]>({
-    queryKey: ['/api/products'],
-  });
+  // Use real-time data fetching
+  const { projects, loading: projectsLoading } = useRealtimePortfolioProjects();
+  const { products, loading: productsLoading } = useRealtimeProducts();
 
   // Delete mutations
   const deleteProjectMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/portfolio-projects/${id}`, {
-      method: 'DELETE',
-    }),
+    mutationFn: deletePortfolioProject,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/portfolio-projects'] });
       toast({ title: 'Project deleted successfully' });
     },
     onError: () => {
@@ -42,11 +40,8 @@ const Admin = () => {
   });
 
   const deleteProductMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/products/${id}`, {
-      method: 'DELETE',
-    }),
+    mutationFn: deleteProduct,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
       toast({ title: 'Product deleted successfully' });
     },
     onError: () => {
@@ -110,7 +105,7 @@ const Admin = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-semibold">Portfolio Projects</h2>
-              <AddProjectModal 
+              <AddProjectModal
                 trigger={
                   <Button>
                     <Plus className="w-4 h-4 mr-2" />
@@ -121,7 +116,7 @@ const Admin = () => {
             </div>
 
             <div className="grid gap-4">
-              {projects.map((project: PortfolioProject) => (
+              {projects.map((project: any) => (
                 <Card key={project.id} className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -164,7 +159,7 @@ const Admin = () => {
               {projects.length === 0 && (
                 <Card className="p-8 text-center">
                   <p className="text-muted-foreground mb-4">No projects found</p>
-                  <AddProjectModal 
+                  <AddProjectModal
                     trigger={
                       <Button>
                         <Plus className="w-4 h-4 mr-2" />
@@ -183,7 +178,7 @@ const Admin = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-semibold">Products</h2>
-              <AddProductModal 
+              <AddProductModal
                 trigger={
                   <Button>
                     <Plus className="w-4 h-4 mr-2" />
@@ -194,7 +189,7 @@ const Admin = () => {
             </div>
 
             <div className="grid gap-4">
-              {products.map((product: Product) => (
+              {products.map((product: any) => (
                 <Card key={product.id} className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -236,7 +231,7 @@ const Admin = () => {
               {products.length === 0 && (
                 <Card className="p-8 text-center">
                   <p className="text-muted-foreground mb-4">No products found</p>
-                  <AddProductModal 
+                  <AddProductModal
                     trigger={
                       <Button>
                         <Plus className="w-4 h-4 mr-2" />

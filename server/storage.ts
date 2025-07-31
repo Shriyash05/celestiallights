@@ -5,7 +5,11 @@ import {
   type Product, type InsertProduct
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
+
+// Define types for selected columns to match query results
+type SelectedPortfolioProject = Pick<PortfolioProject, 'id' | 'title' | 'category' | 'description' | 'location' | 'isPublished' | 'isFeatured' | 'createdAt' | 'updatedAt' | 'videoUrl' | 'images'>;
+type SelectedProduct = Pick<Product, 'id' | 'title' | 'category' | 'description' | 'isPublished' | 'isFeatured' | 'createdAt' | 'updatedAt' | 'imageUrl' | 'technicalSpecifications'>;
 
 export interface IStorage {
   // User methods
@@ -20,21 +24,21 @@ export interface IStorage {
   updateProfile(id: string, updates: Partial<Profile>): Promise<Profile>;
   
   // Portfolio Project methods
-  getAllPortfolioProjects(): Promise<PortfolioProject[]>;
-  getPublishedPortfolioProjects(): Promise<PortfolioProject[]>;
-  getFeaturedPortfolioProjects(): Promise<PortfolioProject[]>;
-  getPortfolioProject(id: string): Promise<PortfolioProject | undefined>;
-  createPortfolioProject(project: InsertPortfolioProject): Promise<PortfolioProject>;
-  updatePortfolioProject(id: string, updates: Partial<PortfolioProject>): Promise<PortfolioProject>;
+  getAllPortfolioProjects(): Promise<SelectedPortfolioProject[]>;
+  getPublishedPortfolioProjects(): Promise<SelectedPortfolioProject[]>;
+  getFeaturedPortfolioProjects(): Promise<SelectedPortfolioProject[]>;
+  getPortfolioProject(id: string): Promise<SelectedPortfolioProject | undefined>;
+  createPortfolioProject(project: InsertPortfolioProject): Promise<{ id: string }>;
+  updatePortfolioProject(id: string, updates: Partial<PortfolioProject>): Promise<{ id: string }>;
   deletePortfolioProject(id: string): Promise<void>;
   
   // Product methods
-  getAllProducts(): Promise<Product[]>;
-  getPublishedProducts(): Promise<Product[]>;
-  getFeaturedProducts(): Promise<Product[]>;
-  getProduct(id: string): Promise<Product | undefined>;
-  createProduct(product: InsertProduct): Promise<Product>;
-  updateProduct(id: string, updates: Partial<Product>): Promise<Product>;
+  getAllProducts(): Promise<SelectedProduct[]>;
+  getPublishedProducts(): Promise<SelectedProduct[]>;
+  getFeaturedProducts(): Promise<SelectedProduct[]>;
+  getProduct(id: string): Promise<SelectedProduct | undefined>;
+  createProduct(product: InsertProduct): Promise<{ id: string }>;
+  updateProduct(id: string, updates: Partial<Product>): Promise<{ id: string }>;
   deleteProduct(id: string): Promise<void>;
 }
 
@@ -80,48 +84,96 @@ export class DatabaseStorage implements IStorage {
   async updateProfile(id: string, updates: Partial<Profile>): Promise<Profile> {
     const [profile] = await db
       .update(profiles)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({ ...updates, updatedAt: new Date().toISOString() as any }) // Cast to any to bypass Drizzle type issue
       .where(eq(profiles.id, id))
       .returning();
     return profile;
   }
 
   // Portfolio Project methods
-  async getAllPortfolioProjects(): Promise<PortfolioProject[]> {
-    return await db.select().from(portfolioProjects).orderBy(portfolioProjects.createdAt);
+  async getAllPortfolioProjects(): Promise<SelectedPortfolioProject[]> {
+    return await db.select({
+      id: portfolioProjects.id,
+      title: portfolioProjects.title,
+      category: portfolioProjects.category,
+      description: portfolioProjects.description,
+      location: portfolioProjects.location,
+      isPublished: portfolioProjects.isPublished,
+      isFeatured: portfolioProjects.isFeatured,
+      createdAt: portfolioProjects.createdAt,
+      updatedAt: portfolioProjects.updatedAt,
+      videoUrl: portfolioProjects.videoUrl,
+      images: portfolioProjects.images,
+    }).from(portfolioProjects).orderBy(portfolioProjects.createdAt);
   }
 
-  async getPublishedPortfolioProjects(): Promise<PortfolioProject[]> {
-    return await db.select().from(portfolioProjects)
+  async getPublishedPortfolioProjects(): Promise<SelectedPortfolioProject[]> {
+    return await db.select({
+      id: portfolioProjects.id,
+      title: portfolioProjects.title,
+      category: portfolioProjects.category,
+      description: portfolioProjects.description,
+      location: portfolioProjects.location,
+      isPublished: portfolioProjects.isPublished,
+      isFeatured: portfolioProjects.isFeatured,
+      createdAt: portfolioProjects.createdAt,
+      updatedAt: portfolioProjects.updatedAt,
+      videoUrl: portfolioProjects.videoUrl,
+      images: portfolioProjects.images,
+    }).from(portfolioProjects)
       .where(eq(portfolioProjects.isPublished, true))
       .orderBy(portfolioProjects.createdAt);
   }
 
-  async getFeaturedPortfolioProjects(): Promise<PortfolioProject[]> {
-    return await db.select().from(portfolioProjects)
+  async getFeaturedPortfolioProjects(): Promise<SelectedPortfolioProject[]> {
+    return await db.select({
+      id: portfolioProjects.id,
+      title: portfolioProjects.title,
+      category: portfolioProjects.category,
+      description: portfolioProjects.description,
+      location: portfolioProjects.location,
+      isPublished: portfolioProjects.isPublished,
+      isFeatured: portfolioProjects.isFeatured,
+      createdAt: portfolioProjects.createdAt,
+      updatedAt: portfolioProjects.updatedAt,
+      videoUrl: portfolioProjects.videoUrl,
+      images: portfolioProjects.images,
+    }).from(portfolioProjects)
       .where(eq(portfolioProjects.isFeatured, true))
       .orderBy(portfolioProjects.createdAt);
   }
 
-  async getPortfolioProject(id: string): Promise<PortfolioProject | undefined> {
-    const [project] = await db.select().from(portfolioProjects).where(eq(portfolioProjects.id, id));
+  async getPortfolioProject(id: string): Promise<SelectedPortfolioProject | undefined> {
+    const [project] = await db.select({
+      id: portfolioProjects.id,
+      title: portfolioProjects.title,
+      category: portfolioProjects.category,
+      description: portfolioProjects.description,
+      location: portfolioProjects.location,
+      isPublished: portfolioProjects.isPublished,
+      isFeatured: portfolioProjects.isFeatured,
+      createdAt: portfolioProjects.createdAt,
+      updatedAt: portfolioProjects.updatedAt,
+      videoUrl: portfolioProjects.videoUrl,
+      images: portfolioProjects.images,
+    }).from(portfolioProjects).where(eq(portfolioProjects.id, id));
     return project || undefined;
   }
 
-  async createPortfolioProject(insertProject: InsertPortfolioProject): Promise<PortfolioProject> {
+  async createPortfolioProject(insertProject: InsertPortfolioProject): Promise<{ id: string }> {
     const [project] = await db
       .insert(portfolioProjects)
       .values(insertProject)
-      .returning();
+      .returning({ id: portfolioProjects.id });
     return project;
   }
 
-  async updatePortfolioProject(id: string, updates: Partial<PortfolioProject>): Promise<PortfolioProject> {
+  async updatePortfolioProject(id: string, updates: Partial<PortfolioProject>): Promise<{ id: string }> {
     const [project] = await db
       .update(portfolioProjects)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({ ...updates, updatedAt: sql`CURRENT_TIMESTAMP` }) // Use SQL to set timestamp
       .where(eq(portfolioProjects.id, id))
-      .returning();
+      .returning({ id: portfolioProjects.id });
     return project;
   }
 
@@ -130,41 +182,85 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Product methods
-  async getAllProducts(): Promise<Product[]> {
-    return await db.select().from(products).orderBy(products.createdAt);
+  async getAllProducts(): Promise<SelectedProduct[]> {
+    return await db.select({
+      id: products.id,
+      title: products.title,
+      category: products.category,
+      description: products.description,
+      isPublished: products.isPublished,
+      isFeatured: products.isFeatured,
+      createdAt: products.createdAt,
+      updatedAt: products.updatedAt,
+      imageUrl: products.imageUrl,
+      technicalSpecifications: products.technicalSpecifications,
+    }).from(products).orderBy(products.createdAt);
   }
 
-  async getPublishedProducts(): Promise<Product[]> {
-    return await db.select().from(products)
+  async getPublishedProducts(): Promise<SelectedProduct[]> {
+    return await db.select({
+      id: products.id,
+      title: products.title,
+      category: products.category,
+      description: products.description,
+      isPublished: products.isPublished,
+      isFeatured: products.isFeatured,
+      createdAt: products.createdAt,
+      updatedAt: products.updatedAt,
+      imageUrl: products.imageUrl,
+      technicalSpecifications: products.technicalSpecifications,
+    }).from(products)
       .where(eq(products.isPublished, true))
       .orderBy(products.createdAt);
   }
 
-  async getFeaturedProducts(): Promise<Product[]> {
-    return await db.select().from(products)
+  async getFeaturedProducts(): Promise<SelectedProduct[]> {
+    return await db.select({
+      id: products.id,
+      title: products.title,
+      category: products.category,
+      description: products.description,
+      isPublished: products.isPublished,
+      isFeatured: products.isFeatured,
+      createdAt: products.createdAt,
+      updatedAt: products.updatedAt,
+      imageUrl: products.imageUrl,
+      technicalSpecifications: products.technicalSpecifications,
+    }).from(products)
       .where(eq(products.isFeatured, true))
       .orderBy(products.createdAt);
   }
 
-  async getProduct(id: string): Promise<Product | undefined> {
-    const [product] = await db.select().from(products).where(eq(products.id, id));
+  async getProduct(id: string): Promise<SelectedProduct | undefined> {
+    const [product] = await db.select({
+      id: products.id,
+      title: products.title,
+      category: products.category,
+      description: products.description,
+      isPublished: products.isPublished,
+      isFeatured: products.isFeatured,
+      createdAt: products.createdAt,
+      updatedAt: products.updatedAt,
+      imageUrl: products.imageUrl,
+      technicalSpecifications: products.technicalSpecifications,
+    }).from(products).where(eq(products.id, id));
     return product || undefined;
   }
 
-  async createProduct(insertProduct: InsertProduct): Promise<Product> {
+  async createProduct(insertProduct: InsertProduct): Promise<{ id: string }> {
     const [product] = await db
       .insert(products)
       .values(insertProduct)
-      .returning();
+      .returning({ id: products.id });
     return product;
   }
 
-  async updateProduct(id: string, updates: Partial<Product>): Promise<Product> {
+  async updateProduct(id: string, updates: Partial<Product>): Promise<{ id: string }> {
     const [product] = await db
       .update(products)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({ ...updates, updatedAt: sql`CURRENT_TIMESTAMP` }) // Use SQL to set timestamp
       .where(eq(products.id, id))
-      .returning();
+      .returning({ id: products.id });
     return product;
   }
 

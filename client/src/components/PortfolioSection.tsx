@@ -4,13 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, Filter, ArrowRight } from "lucide-react";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import type { PortfolioProject } from "@shared/schema";
+import type { PortfolioProject } from "@/lib/realtimeService";
 import residentialImage from "@/assets/residential-lighting.jpg";
 import commercialImage from "@/assets/commercial-project.jpg";
 import ProjectDetailModal from "./ProjectDetailModal";
 import QuoteModal from "@/components/QuoteModal";
 import { useAuth } from "@/hooks/useAuth";
+import { useRealtimePortfolioProjects } from "@/lib/realtimeService";
 
 const PortfolioSection = () => {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -18,9 +18,7 @@ const PortfolioSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useAuth();
 
-  const { data: projects = [], isLoading: loading } = useQuery<PortfolioProject[]>({
-    queryKey: ["/api/portfolio-projects"],
-  });
+  const { projects, loading } = useRealtimePortfolioProjects();
 
   // Filter only featured projects for the section
   const featuredProjects = projects.filter(project => project.isFeatured);
@@ -36,8 +34,8 @@ const PortfolioSection = () => {
     // Fallback to imageUrl
     if (project.imageUrl) return project.imageUrl;
     // Final fallback to default images
-    return project.category === 'residential' || project.category === 'hospitality' 
-      ? residentialImage 
+    return project.category === 'residential' || project.category === 'hospitality'
+      ? residentialImage
       : commercialImage;
   };
 
@@ -59,8 +57,8 @@ const PortfolioSection = () => {
     { id: "industrial", label: "Industrial" }
   ];
 
-  const filteredProjects = activeFilter === "all" 
-    ? projects 
+  const filteredProjects = activeFilter === "all"
+    ? projects
     : projects.filter(project => project.category === activeFilter);
 
   return (
@@ -74,7 +72,7 @@ const PortfolioSection = () => {
             <span className="text-primary"> Stories</span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Explore our diverse portfolio of lighting projects that showcase innovation, 
+            Explore our diverse portfolio of lighting projects that showcase innovation,
             quality, and the transformative power of exceptional illumination.
           </p>
         </div>
@@ -88,14 +86,14 @@ const PortfolioSection = () => {
             </div>
             <div className="grid md:grid-cols-2 gap-8">
               {featuredProjects.map((project) => (
-                <Card 
-                  key={`featured-${project.id}`} 
+                <Card
+                  key={`featured-${project.id}`}
                   className="overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-background to-primary/5 hover:shadow-elegant transition-all duration-300 group cursor-pointer"
                   onClick={() => handleProjectClick(project)}
                 >
                   <div className="relative overflow-hidden">
-                    <img 
-                      src={getProjectImage(project)} 
+                    <img
+                      src={getProjectImage(project)}
                       alt={project.title}
                       className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -104,9 +102,8 @@ const PortfolioSection = () => {
                         ★ Featured
                       </Badge>
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <Button 
-                      variant="glow" 
+                    <Button
+                      variant="glow"
                       size="icon"
                       className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     >
@@ -165,20 +162,20 @@ const PortfolioSection = () => {
             </div>
             <div className="grid md:grid-cols-3 gap-6">
               {nonFeaturedProjects.slice(0, 6).map((project) => (
-                <Card 
-                  key={`additional-${project.id}`} 
+                <Card
+                  key={`additional-${project.id}`}
                   className="overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer"
                   onClick={() => handleProjectClick(project)}
                 >
                   <div className="relative overflow-hidden">
-                    <img 
-                      src={getProjectImage(project)} 
+                    <img
+                      src={getProjectImage(project)}
                       alt={project.title}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="icon"
                       className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                     >
@@ -240,20 +237,20 @@ const PortfolioSection = () => {
             ))
           ) : filteredProjects.length > 0 ? (
             filteredProjects.map((project) => (
-              <Card 
-                key={project.id} 
+              <Card
+                key={project.id}
                 className="overflow-hidden border-0 bg-background hover:shadow-elegant transition-all duration-300 group cursor-pointer"
                 onClick={() => handleProjectClick(project)}
               >
                 <div className="relative overflow-hidden">
-                  <img 
-                    src={getProjectImage(project)} 
+                  <img
+                    src={getProjectImage(project)}
                     alt={project.title}
                     className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <Button 
-                    variant="glow" 
+                  <Button
+                    variant="glow"
                     size="icon"
                     className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   >
@@ -301,7 +298,7 @@ const PortfolioSection = () => {
           <div className="bg-gradient-hero rounded-3xl p-12 border border-primary/20">
             <h3 className="text-3xl font-bold mb-4">Ready to Start Your Project?</h3>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Let's discuss how we can transform your space with custom lighting solutions 
+              Let's discuss how we can transform your space with custom lighting solutions
               that exceed your expectations.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -323,7 +320,7 @@ const PortfolioSection = () => {
         </div>
       </div>
       
-      <ProjectDetailModal 
+      <ProjectDetailModal
         project={selectedProject}
         isOpen={isModalOpen}
         onClose={closeModal}

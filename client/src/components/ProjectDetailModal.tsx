@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star, X, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import type { PortfolioProject } from '@shared/schema';
+import type { PortfolioProject } from '@/lib/realtimeService';
 
 interface ProjectDetailModalProps {
   project: PortfolioProject | null;

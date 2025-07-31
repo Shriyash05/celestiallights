@@ -188,40 +188,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth API
   app.post("/api/auth/signin", async (req, res) => {
     try {
-      const { email, password } = req.body;
-      if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required" });
-      }
+      // With Supabase Auth, client-side authentication is preferred
+      // This endpoint is kept for compatibility but should not be used for actual authentication
+      // Authentication should be handled client-side with Supabase Auth
       
-      // Check if user exists and validate credentials
-      const profile = await storage.getProfileByEmail(email);
-      
-      // For security, check if it's an admin email and password matches expected
-      const adminCredentials = [
-        { email: 'admin@celestiallights.com', password: 'admin123' },
-        { email: 'info.celestiallight@gmail.com', password: 'celestial2024' }
-      ];
-      
-      const validAdmin = adminCredentials.find(
-        cred => cred.email === email && cred.password === password
-      );
-      
-      if (!validAdmin) {
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
-      
-      // Create or update admin profile if doesn't exist
-      if (!profile) {
-        await storage.createProfile({
-          id: `admin-${Date.now()}`,
-          email,
-          role: 'admin'
-        });
-      }
-      
-      res.json({ 
-        user: { id: profile?.id || `admin-${Date.now()}`, email },
-        isAdmin: true 
+      res.status(400).json({
+        error: "Authentication is handled client-side with Supabase Auth",
+        message: "Please use the client-side authentication flow"
       });
     } catch (error) {
       console.error("Error during signin:", error);
