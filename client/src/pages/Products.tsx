@@ -21,10 +21,15 @@ const Products = () => {
   });
 
   const getProductImage = (product: Product) => {
+    // Always use the first image from images array if available (consistent main image)
+    if (product.images && product.images.length > 0) {
+      return product.images[0];
+    }
+    // Fallback to imageUrl (legacy support)
     if (product.imageUrl) return product.imageUrl;
     
-    // Fallback images based on category
-    const fallbackImages = {
+    // Consistent fallback images based on category (prevent random images)
+    const fallbackImages: Record<string, string> = {
       'Smart Lighting': 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=600&fit=crop',
       'Outdoor Lighting': 'https://images.unsplash.com/photo-1500673922987-e212871fec22?w=800&h=600&fit=crop',
       'Indoor Lighting': 'https://images.unsplash.com/photo-1721322800607-8c38375eef04?w=800&h=600&fit=crop',
@@ -32,8 +37,7 @@ const Products = () => {
       'Decorative Lighting': 'https://images.unsplash.com/photo-1485833077593-4278bba3f11f?w=800&h=600&fit=crop'
     };
     
-    return fallbackImages[product.category as keyof typeof fallbackImages] || 
-           'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=600&fit=crop';
+    return fallbackImages[product.category] || fallbackImages['Indoor Lighting'];
   };
 
   const categories = ['All', ...Array.from(new Set(products.map(product => product.category)))];

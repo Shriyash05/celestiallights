@@ -34,13 +34,19 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
     }
   }, [isPlaying, allImages.length]);
 
-  // Reset slideshow when modal opens/closes
+  // Reset slideshow when modal opens/closes or product changes
   useEffect(() => {
     if (!isOpen) {
       setIsPlaying(false);
       setCurrentImageIndex(0);
     }
   }, [isOpen]);
+
+  // Reset current image index when product changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+    setIsPlaying(false);
+  }, [product?.id]);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
