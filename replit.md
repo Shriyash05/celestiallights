@@ -1,7 +1,7 @@
-# Professional Lighting Company Website
+# Celestial Lights - Professional Lighting Company Website
 
 ## Project Overview
-A modern full-stack web application for a professional lighting company featuring:
+A modern full-stack web application for Celestial Lights featuring:
 - Interactive product catalog with detailed product information
 - Project portfolio showcase with case studies
 - Quote request system with real-time communication
@@ -21,7 +21,7 @@ A modern full-stack web application for a professional lighting company featurin
 
 ### Backend (Express + TypeScript)
 - **Framework**: Express.js with TypeScript
-- **Database**: PostgreSQL with Drizzle ORM
+- **Database**: PostgreSQL with Drizzle ORM via Supabase
 - **Authentication**: Passport.js with local strategy
 - **File Uploads**: Multer for handling media files
 - **Email**: Nodemailer for contact forms and notifications
@@ -29,10 +29,11 @@ A modern full-stack web application for a professional lighting company featurin
 
 ### Key Features
 - Product catalog with categories and detailed specs
-- Project portfolio with before/after images
+- Project portfolio with before/after images and videos
 - Quote request system with form submissions
 - Admin panel for content management
-- File upload system for project images
+- File upload system for project images and videos
+- Real-time updates using Supabase subscriptions
 - Email notifications for inquiries
 - Mobile-responsive design
 
@@ -43,18 +44,21 @@ A modern full-stack web application for a professional lighting company featurin
 - Users: admin authentication system
 
 ## User Preferences
-*To be updated based on user interactions*
+- Deploy to GoDaddy hosting
+- Remove all development environment references
+- Professional production-ready configuration
 
 ## Recent Changes
-- **2025-01-31**: Project migrated from Replit Agent to Replit environment
-- Configured for proper client/server separation
-- All dependencies installed and verified
-- Database connection established with Supabase PostgreSQL
-- Fixed UI issues: consistent image display, technical specifications, video playback
-- Resolved type inconsistencies between schema and realtime service
+- **2025-01-31**: Enhanced real-time functionality with Supabase subscriptions
+- Fixed video display in project detail modals
+- Implemented consistent image selection (no random photos)
+- Added manual event fallbacks for real-time updates  
+- Prepared for GoDaddy deployment with production configuration
+- Removed development environment references
 
-## Development Notes
-- Server runs on port 5001 to avoid conflicts
+## Deployment Notes
+- Configured for production deployment on GoDaddy
+- Uses Supabase PostgreSQL for database
+- Real-time subscriptions for instant UI updates
 - Static file serving configured for uploads
-- Vite dev server integrated for hot reloading
-- Cross-env setup for environment variable handling
+- Cross-platform compatibility for hosting environments

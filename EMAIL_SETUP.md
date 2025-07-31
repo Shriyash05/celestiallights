@@ -1,43 +1,141 @@
-# Email Setup Guide
+# Email Configuration for Celestial Lights Website
 
-The application now supports free email functionality using Nodemailer. To enable email notifications for quote requests, you can set up any free SMTP provider.
+## Current Email Setup
 
-## Free SMTP Options
+The contact forms and quote requests use **Nodemailer** with SMTP configuration.
 
-### 1. Gmail (Recommended for testing)
-- **SMTP_HOST**: smtp.gmail.com
-- **SMTP_PORT**: 587
-- **SMTP_SECURE**: false
-- **SMTP_USER**: your-gmail@gmail.com
-- **SMTP_PASS**: your-app-password (not regular password)
-- **ADMIN_EMAIL**: where-to-send-quotes@yourdomain.com
+### Configuration Required
 
-Note: You'll need to generate an "App Password" in your Gmail security settings.
+Add these environment variables to your hosting:
 
-### 2. Outlook/Hotmail
-- **SMTP_HOST**: smtp.live.com
-- **SMTP_PORT**: 587
-- **SMTP_SECURE**: false
-- **SMTP_USER**: your-email@outlook.com
-- **SMTP_PASS**: your-password
+```env
+# Email Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_business_email@gmail.com
+SMTP_PASS=your_app_specific_password
 
-### 3. Yahoo Mail
-- **SMTP_HOST**: smtp.mail.yahoo.com
-- **SMTP_PORT**: 587 or 465
-- **SMTP_SECURE**: true (for port 465)
-- **SMTP_USER**: your-email@yahoo.com
-- **SMTP_PASS**: your-app-password
+# Business Information
+BUSINESS_NAME=Celestial Lights
+BUSINESS_EMAIL=info.celestiallight@gmail.com
+BUSINESS_PHONE=+91 98765 43210
+```
 
-## How to Add Email Credentials
+## Email Features
 
-Add these environment variables to your `.env` file:
-- SMTP_HOST
-- SMTP_PORT
-- SMTP_SECURE
-- SMTP_USER
-- SMTP_PASS
-- ADMIN_EMAIL
+### 1. Quote Request Notifications
+When customers submit quote requests:
+- ✅ Customer receives confirmation email
+- ✅ Business receives notification with quote details
+- ✅ Auto-reply with business contact information
 
-## Without Email Setup
+### 2. Contact Form Submissions
+When customers use contact forms:
+- ✅ Business receives inquiry details
+- ✅ Customer receives acknowledgment
+- ✅ Includes customer's contact information
 
-The application works perfectly without email setup - quote requests will be logged to the server console and you can manually check them there.
+### 3. WhatsApp Integration
+- ✅ Automatic WhatsApp link generation
+- ✅ Pre-filled messages for quote requests
+- ✅ Direct communication channel
+
+## Gmail Setup (Recommended)
+
+### 1. Create Business Gmail Account
+1. Create `info.celestiallight@gmail.com` (or your preferred business email)
+2. Enable 2-Factor Authentication
+
+### 2. Generate App Password
+1. Go to Google Account Settings
+2. Security → 2-Step Verification → App passwords
+3. Generate password for "Mail"
+4. Use this password in `SMTP_PASS`
+
+### 3. Update Environment Variables
+```env
+SMTP_USER=info.celestiallight@gmail.com
+SMTP_PASS=your_16_character_app_password
+```
+
+## Alternative SMTP Providers
+
+### SendGrid
+```env
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=587
+SMTP_USER=apikey
+SMTP_PASS=your_sendgrid_api_key
+```
+
+### Mailgun
+```env
+SMTP_HOST=smtp.mailgun.org
+SMTP_PORT=587
+SMTP_USER=your_mailgun_username
+SMTP_PASS=your_mailgun_password
+```
+
+## Email Templates
+
+The application includes pre-built templates for:
+
+### Quote Request Confirmation
+```
+Subject: Quote Request Received - Celestial Lights
+Content: Professional acknowledgment with next steps
+```
+
+### Business Notification
+```
+Subject: New Quote Request from [Customer Name]
+Content: Complete customer details and project requirements
+```
+
+## Testing Email Configuration
+
+After deployment, test email functionality:
+
+1. **Submit Quote Request**: Verify both customer and business emails
+2. **Contact Form**: Check form submission notifications
+3. **Error Handling**: Ensure graceful failures if SMTP fails
+
+## WhatsApp Configuration
+
+Current WhatsApp settings in `client/src/config/contact.ts`:
+
+```typescript
+whatsappNumber: "918976453765"
+businessPhone: "+91 98765 43210"  
+businessEmail: "info.celestiallight@gmail.com"
+```
+
+Update these numbers with your actual business contact details.
+
+## Troubleshooting
+
+### Common Issues:
+
+1. **Emails not sending**
+   - Verify SMTP credentials
+   - Check Gmail app password
+   - Ensure 2FA is enabled
+
+2. **Emails in spam**
+   - Use business domain email
+   - Configure SPF/DKIM records
+   - Add sender to contacts
+
+3. **Rate limiting**
+   - Gmail: 500 emails/day
+   - Consider upgrading to business email service
+
+## Production Checklist
+
+- ✅ Business email account created
+- ✅ App password generated  
+- ✅ Environment variables configured
+- ✅ Email templates tested
+- ✅ WhatsApp number updated
+- ✅ Spam folder checked
+- ✅ Error handling verified
