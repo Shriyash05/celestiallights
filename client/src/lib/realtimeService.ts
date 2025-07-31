@@ -19,7 +19,7 @@ export const useRealtimePortfolioProjects = () => {
         const { data, error } = await supabase
           .from('portfolio_projects')
           .select('*')
-          .order('created_at', { ascending: false }); // Changed to created_at
+          .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error fetching projects:', error);
@@ -98,7 +98,7 @@ export const useRealtimeProducts = () => {
         const { data, error } = await supabase
           .from('products')
           .select('*')
-          .order('created_at', { ascending: false }); // Changed to created_at
+          .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error fetching products:', error);
