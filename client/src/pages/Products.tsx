@@ -204,7 +204,7 @@ const Products = () => {
           <QuoteModal 
             trigger={
               <Button size="lg">
-                Get Free Consultation
+                Get Consultation
               </Button>
             }
             type="consultation" 

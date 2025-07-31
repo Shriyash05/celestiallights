@@ -5,6 +5,7 @@ import { Link } from "wouter";
 import Counter from "@/components/Counter";
 import heroImage from "@/assets/hero-lighting.jpg";
 import QuoteModal from "@/components/QuoteModal";
+import CallUsButton from "@/components/CallUsButton";
 
 const HeroSection = () => {
   return (
@@ -27,8 +28,8 @@ const HeroSection = () => {
               join us
             </span>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
-              Make Your
-              <span className="block text-transparent bg-gradient-accent bg-clip-text">
+              Make Your<br />
+              <span className="text-yellow-400 drop-shadow-lg">
                 Ambience Heavenly
               </span>
             </h1>

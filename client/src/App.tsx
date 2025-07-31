@@ -11,6 +11,9 @@ import Admin from "./pages/Admin";
 import Portfolio from "./pages/Portfolio";
 import Products from "./pages/Products";
 import NotFound from "./pages/NotFound";
+import LightTrail from "@/components/LightTrail";
+import { FloatingParticles, Constellation } from "@/components/LightAnimations";
+import ParticleField from "@/components/ParticleField";
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -18,6 +21,10 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <LightTrail />
+        <FloatingParticles />
+        <Constellation />
+        <ParticleField />
         <Router>
           <Switch>
             <Route path="/" component={Index} />

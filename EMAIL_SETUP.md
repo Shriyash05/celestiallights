@@ -30,7 +30,7 @@ Note: You'll need to generate an "App Password" in your Gmail security settings.
 
 ## How to Add Email Credentials
 
-Add these environment variables to your Replit secrets:
+Add these environment variables to your `.env` file:
 - SMTP_HOST
 - SMTP_PORT
 - SMTP_SECURE

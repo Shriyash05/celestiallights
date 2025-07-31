@@ -127,8 +127,8 @@ const ParticleField = ({
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 pointer-events-none"
-      style={{ opacity: 0.4 }}
+      className="fixed inset-0 pointer-events-none z-50"
+      style={{ opacity: 0.7 }}
     />
   );
 };

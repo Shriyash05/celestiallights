@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Lightbulb, Building, Home, Smartphone, ArrowRight } from "lucide-react";
+import CallUsButton from "@/components/CallUsButton";
 
 const ServicesSection = () => {
   const services = [
@@ -112,6 +113,20 @@ const ServicesSection = () => {
                 <p className="text-sm text-muted-foreground">{item.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center mt-16 pt-16 border-t border-border">
+          <h3 className="text-2xl font-bold mb-4">Ready to Get Started?</h3>
+          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Contact us today to discuss your lighting needs and explore our comprehensive solutions.
+          </p>
+          <div className="flex justify-center gap-4">
+            <CallUsButton 
+              size="lg"
+              children="Call Us Now"
+            />
           </div>
         </div>
       </div>

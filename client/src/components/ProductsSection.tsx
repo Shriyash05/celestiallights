@@ -7,6 +7,7 @@ import { Link } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import type { Product } from '@shared/schema';
 import ProductDetailModal from './ProductDetailModal';
+import CallUsButton from '@/components/CallUsButton';
 
 const ProductsSection = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -162,13 +163,20 @@ const ProductsSection = () => {
               ))}
             </div>
 
-            <div className="text-center">
-              <Link to="/products">
-                <Button size="lg" className="group">
-                  View All Products
-                  <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+            <div className="text-center space-y-4">
+              <div className="flex justify-center gap-4">
+                <Link to="/products">
+                  <Button size="lg" className="group">
+                    View All Products
+                    <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <CallUsButton 
+                  variant="outline" 
+                  size="lg"
+                  children="Call Us"
+                />
+              </div>
             </div>
           </>
         )}

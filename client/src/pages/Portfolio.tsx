@@ -8,6 +8,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { PortfolioProject } from "@shared/schema";
 import QuoteModal from "@/components/QuoteModal";
+import CallUsButton from "@/components/CallUsButton";
 
 // Import fallback images
 import residentialLighting from "@/assets/residential-lighting.jpg";
@@ -179,14 +180,16 @@ const Portfolio = () => {
             <QuoteModal 
               trigger={
                 <Button size="lg">
-                  Get Free Consultation
+                  Get Consultation
                 </Button>
               }
               type="consultation" 
             />
-            <Button variant="outline" size="lg" asChild>
-              <a href="tel:+1234567890">Call Us Now</a>
-            </Button>
+            <CallUsButton 
+              variant="outline" 
+              size="lg"
+              children="Call Us Now"
+            />
           </div>
         </div>
       </div>

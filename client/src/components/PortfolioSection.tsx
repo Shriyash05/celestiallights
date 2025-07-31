@@ -9,6 +9,7 @@ import type { PortfolioProject } from "@shared/schema";
 import residentialImage from "@/assets/residential-lighting.jpg";
 import commercialImage from "@/assets/commercial-project.jpg";
 import ProjectDetailModal from "./ProjectDetailModal";
+import QuoteModal from "@/components/QuoteModal";
 import { useAuth } from "@/hooks/useAuth";
 
 const PortfolioSection = () => {
@@ -305,13 +306,18 @@ const PortfolioSection = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/portfolio">
-                <Button variant="hero" size="lg">
+                <Button variant="premium" size="lg">
                   View Full Portfolio
                 </Button>
               </Link>
-              <Button variant="premium" size="lg">
-                Request Consultation
-              </Button>
+              <QuoteModal
+                type="consultation"
+                trigger={
+                  <Button variant="premium" size="lg">
+                    Request Consultation
+                  </Button>
+                }
+              />
             </div>
           </div>
         </div>

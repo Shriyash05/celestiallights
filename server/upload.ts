@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter for images and videos
+// File filter for images, videos, and PDFs
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   // Allow images
   if (file.mimetype.startsWith('image/')) {
@@ -33,9 +33,13 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
   else if (file.mimetype.startsWith('video/')) {
     cb(null, true);
   }
+  // Allow PDFs
+  else if (file.mimetype === 'application/pdf') {
+    cb(null, true);
+  }
   // Reject other files
   else {
-    cb(new Error('Only image and video files are allowed!'));
+    cb(new Error('Only image, video, and PDF files are allowed!'));
   }
 };
 

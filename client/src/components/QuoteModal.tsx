@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, FileText, Loader2 } from "lucide-react";
+import { MessageCircle, FileText, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { CONTACT_CONFIG } from "@/config/contact";
 
 interface QuoteModalProps {
   trigger: React.ReactNode;
@@ -16,11 +17,11 @@ interface QuoteModalProps {
 
 const QuoteModal: React.FC<QuoteModalProps> = ({ trigger, type }) => {
   const { toast } = useToast();
-  
+
   // Modal state
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   // Form data state
   const [formData, setFormData] = useState({
     name: "",
@@ -45,47 +46,50 @@ const QuoteModal: React.FC<QuoteModalProps> = ({ trigger, type }) => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      const subject = type === "quote" ? "Quote Request - Celestial Lights" : "Consultation Request - Celestial Lights";
-      
-      const emailBody = `Dear Celestial Lights Team,
+      // Create detailed WhatsApp message with all form data
+      let whatsappMessage = `Hi! I'm interested in your lighting solutions and would like to request a ${type}.
 
-I am interested in your lighting solutions and would like to request a ${type}.
+*Project Details:*
+• Name: ${formData.name}
+• Email: ${formData.email}
+• Phone: ${formData.phone || 'Not provided'}
+• Project Type: ${formData.projectType}
+• Location: ${formData.location || 'Not specified'}
+• Budget Range: ${formData.budget || 'Not specified'}
+• Timeline: ${formData.timeline || 'Not specified'}
 
-Project Details:
-- Name: ${formData.name}
-- Email: ${formData.email}
-- Phone: ${formData.phone}
-- Project Type: ${formData.projectType}
-- Location: ${formData.location}
-- Budget Range: ${formData.budget}
-- Timeline: ${formData.timeline}
+*Project Description:*
+${formData.description}`;
 
-Project Description:
-${formData.description}
+      // Add PDF note if needed
+      if (formData.needsPdf) {
+        whatsappMessage += `
 
-${formData.needsPdf ? "\nNote: I will attach a detailed PDF with project requirements separately." : ""}
+*PDF Requirements:*
+I have a PDF file with detailed project requirements that I can share directly in this chat after connecting.`;
+      }
 
-Thank you for your time. I look forward to hearing from you soon.
+      whatsappMessage += `
 
-Best regards,
-${formData.name}`;
+Please get back to me soon! Thank you.`;
 
-      const mailtoLink = `mailto:info.celestiallight@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-      
       // Simulate processing time
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      window.open(mailtoLink, '_blank');
-      
+
+      // Open WhatsApp directly
+      const whatsappLink = `https://wa.me/${CONTACT_CONFIG.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+      window.open(whatsappLink, '_blank');
+
       toast({
-        title: "Email Client Opened",
-        description: "Your email client has been opened with pre-filled information. Please send the email to complete your request.",
+        title: "WhatsApp Opened",
+        description:
+          "You've been redirected to WhatsApp. You can share your PDF directly in the chat after connecting.",
       });
-      
+
       setIsOpen(false);
-      
+
       // Reset form
       setFormData({
         name: "",
@@ -117,16 +121,16 @@ ${formData.name}`;
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5 text-primary" />
+            <MessageCircle className="h-5 w-5 text-primary" />
             {type === "quote" ? "Request Quote" : "Schedule Consultation"}
           </DialogTitle>
           <DialogDescription>
-            {type === "quote" 
+            {type === "quote"
               ? "Get a detailed quote for your lighting project with custom specifications."
               : "Schedule a free consultation to discuss your lighting needs and explore solutions."}
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="name">Full Name *</Label>
@@ -235,28 +239,38 @@ ${formData.name}`;
           />
         </div>
         
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="needsPdf"
-            checked={formData.needsPdf}
-            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, needsPdf: checked as boolean }))}
-          />
-          <Label htmlFor="needsPdf" className="flex items-center gap-2 text-sm">
-            <FileText className="h-4 w-4" />
-            I will attach a detailed PDF with project requirements
-          </Label>
+        {/* PDF Note Section */}
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="needsPdf"
+              checked={formData.needsPdf}
+              onCheckedChange={(checked) => setFormData(prev => ({ ...prev, needsPdf: checked as boolean }))}
+            />
+            <Label htmlFor="needsPdf" className="flex items-center gap-2 text-sm">
+              <FileText className="h-4 w-4" />
+              I will attach a detailed PDF with project requirements
+            </Label>
+          </div>
+          {formData.needsPdf && (
+            <div className="bg-muted p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                <strong>Note:</strong> You can upload and share your PDF requirements directly in the WhatsApp chat after you are redirected.
+              </p>
+            </div>
+          )}
         </div>
-        
+
         <div className="flex gap-4 pt-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => setIsOpen(false)}
             className="flex-1"
             disabled={isSubmitting}
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleSubmit}
             disabled={!formData.name || !formData.email || !formData.projectType || !formData.description || isSubmitting}
             className="flex-1"
@@ -268,20 +282,12 @@ ${formData.name}`;
               </>
             ) : (
               <>
-                <Mail className="mr-2 h-4 w-4" />
-                Open Email Client
+                <MessageCircle className="mr-2 h-4 w-4" />
+                Send via WhatsApp
               </>
             )}
           </Button>
         </div>
-        
-        {formData.needsPdf && (
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              <strong>Note:</strong> After sending the email, you can attach your PDF requirements document directly in your email client before sending.
-            </p>
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );

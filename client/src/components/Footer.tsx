@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Phone, Mail, MapPin, Lightbulb } from "lucide-react";
 import QuoteModal from "@/components/QuoteModal";
+import CallUsButton from "@/components/CallUsButton";
 
 const Footer = () => {
 
@@ -93,7 +94,7 @@ const Footer = () => {
               <QuoteModal 
                 type="quote"
                 trigger={
-                  <Button variant="hero" className="w-full">
+                  <Button variant="outline" className="w-full">
                     Request Quote
                   </Button>
                 }
@@ -105,6 +106,11 @@ const Footer = () => {
                     Schedule Consultation
                   </Button>
                 }
+              />
+              <CallUsButton 
+                variant="outline" 
+                className="w-full"
+                children="Call Us Now"
               />
             </div>
           </div>

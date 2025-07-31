@@ -5,9 +5,9 @@ import GlowingButton from "@/components/GlowingButton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Mail, MapPin, Clock, Send } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Send, MessageCircle, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { CONTACT_CONFIG } from "@/config/contact";
 
 const ContactSection = () => {
   const { toast } = useToast();
@@ -23,26 +23,52 @@ const ContactSection = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    
-    try {
-      await apiRequest('/api/send-quote-email', {
-        method: 'POST',
-        body: JSON.stringify({
-          customerName: formData.name,
-          customerEmail: formData.email,
-          projectType: formData.projectType || 'General inquiry',
-          phone: formData.phone,
-          company: formData.company,
-          message: formData.message
-        }),
-      });
-      
+
+    if (!formData.name || !formData.email || !formData.message) {
       toast({
-        title: "Quote Request Submitted",
-        description: "Thank you for your interest! We'll contact you within 24 hours.",
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
       });
-      
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Create detailed WhatsApp message with all form data
+      let whatsappMessage = `Hi! I'm interested in your lighting solutions and would like to request a custom quote.
+
+*Project Details:*
+• Name: ${formData.name}
+• Email: ${formData.email}
+• Phone: ${formData.phone || 'Not provided'}
+• Company: ${formData.company || 'Not specified'}
+• Project Type: ${formData.projectType || 'Not specified'}
+
+*Project Description:*
+${formData.message}
+
+*PDF Requirements:*
+I have a PDF file with detailed project requirements that I can share directly in this chat after connecting.
+`;
+
+      whatsappMessage += `\n\nPlease get back to me soon! Thank you.`;
+
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Open WhatsApp directly
+      const whatsappLink = `https://wa.me/${CONTACT_CONFIG.whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+      window.open(whatsappLink, '_blank');
+
+      toast({
+        title: "WhatsApp Opened",
+        description:
+          "You've been redirected to WhatsApp. You can share your PDF directly in the chat after connecting.",
+      });
+
+      // Reset form
       setFormData({
         name: "",
         email: "",
@@ -53,8 +79,8 @@ const ContactSection = () => {
       });
     } catch (error) {
       toast({
-        title: "Error submitting request",
-        description: "Please try again or contact us directly.",
+        title: "Error",
+        description: "Something went wrong. Please try again or contact us directly.",
         variant: "destructive",
       });
     } finally {
@@ -237,15 +263,35 @@ const ContactSection = () => {
                     />
                   </div>
 
+                  {/* PDF Upload Section */}
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <FileText className="h-4 w-4 text-primary" />
+                      <span className="text-sm">
+                        <strong>Note:</strong> You can upload and share your PDF requirements directly in the WhatsApp chat after you are redirected.
+                      </span>
+                    </div>
+                  </div>
+
                   <GlowingButton 
                     type="submit" 
                     size="lg" 
                     className="w-full group"
                     glowColor="golden"
                     intensity="high"
+                    disabled={isSubmitting}
                   >
-                    <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                    Send Quote Request
+                    {isSubmitting ? (
+                      <>
+                        <div className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <MessageCircle className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                        Send via WhatsApp
+                      </>
+                    )}
                   </GlowingButton>
                 </form>
               </CardContent>

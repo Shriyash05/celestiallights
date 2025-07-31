@@ -103,10 +103,10 @@ const LightTrail = ({
 
   return (
     <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-10"
-      style={{ mixBlendMode: 'screen' }}
-    />
+  ref={canvasRef}
+  className="fixed inset-0 pointer-events-none z-50"
+  style={{ mixBlendMode: 'screen' }}
+/>
   );
 };
 
