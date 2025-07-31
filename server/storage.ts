@@ -9,7 +9,7 @@ import { eq, sql } from "drizzle-orm";
 
 // Define types for selected columns to match query results
 type SelectedPortfolioProject = Pick<PortfolioProject, 'id' | 'title' | 'category' | 'description' | 'features' | 'location' | 'isPublished' | 'isFeatured' | 'createdAt' | 'updatedAt' | 'videoUrl' | 'images'>;
-type SelectedProduct = Pick<Product, 'id' | 'title' | 'category' | 'description' | 'isPublished' | 'isFeatured' | 'createdAt' | 'updatedAt' | 'imageUrl' | 'technicalSpecifications'>;
+type SelectedProduct = Pick<Product, 'id' | 'title' | 'category' | 'description' | 'isPublished' | 'isFeatured' | 'createdAt' | 'updatedAt' | 'imageUrl' | 'images' | 'technicalSpecifications' | 'dimensions' | 'bodyColor' | 'beamAngle' | 'powerConsumption' | 'ipRating' | 'colorTemperature' | 'lumensOutput' | 'material' | 'mountingType' | 'controlType' | 'warrantyPeriod' | 'certifications'>;
 
 export interface IStorage {
   // User methods
@@ -197,7 +197,20 @@ export class DatabaseStorage implements IStorage {
       createdAt: products.createdAt,
       updatedAt: products.updatedAt,
       imageUrl: products.imageUrl,
+      images: products.images,
       technicalSpecifications: products.technicalSpecifications,
+      dimensions: products.dimensions,
+      bodyColor: products.bodyColor,
+      beamAngle: products.beamAngle,
+      powerConsumption: products.powerConsumption,
+      ipRating: products.ipRating,
+      colorTemperature: products.colorTemperature,
+      lumensOutput: products.lumensOutput,
+      material: products.material,
+      mountingType: products.mountingType,
+      controlType: products.controlType,
+      warrantyPeriod: products.warrantyPeriod,
+      certifications: products.certifications,
     }).from(products).orderBy(products.createdAt);
   }
 
@@ -212,7 +225,20 @@ export class DatabaseStorage implements IStorage {
       createdAt: products.createdAt,
       updatedAt: products.updatedAt,
       imageUrl: products.imageUrl,
+      images: products.images,
       technicalSpecifications: products.technicalSpecifications,
+      dimensions: products.dimensions,
+      bodyColor: products.bodyColor,
+      beamAngle: products.beamAngle,
+      powerConsumption: products.powerConsumption,
+      ipRating: products.ipRating,
+      colorTemperature: products.colorTemperature,
+      lumensOutput: products.lumensOutput,
+      material: products.material,
+      mountingType: products.mountingType,
+      controlType: products.controlType,
+      warrantyPeriod: products.warrantyPeriod,
+      certifications: products.certifications,
     }).from(products)
       .where(eq(products.isPublished, true))
       .orderBy(products.createdAt);
@@ -229,7 +255,20 @@ export class DatabaseStorage implements IStorage {
       createdAt: products.createdAt,
       updatedAt: products.updatedAt,
       imageUrl: products.imageUrl,
+      images: products.images,
       technicalSpecifications: products.technicalSpecifications,
+      dimensions: products.dimensions,
+      bodyColor: products.bodyColor,
+      beamAngle: products.beamAngle,
+      powerConsumption: products.powerConsumption,
+      ipRating: products.ipRating,
+      colorTemperature: products.colorTemperature,
+      lumensOutput: products.lumensOutput,
+      material: products.material,
+      mountingType: products.mountingType,
+      controlType: products.controlType,
+      warrantyPeriod: products.warrantyPeriod,
+      certifications: products.certifications,
     }).from(products)
       .where(eq(products.isFeatured, true))
       .orderBy(products.createdAt);
@@ -246,7 +285,20 @@ export class DatabaseStorage implements IStorage {
       createdAt: products.createdAt,
       updatedAt: products.updatedAt,
       imageUrl: products.imageUrl,
+      images: products.images,
       technicalSpecifications: products.technicalSpecifications,
+      dimensions: products.dimensions,
+      bodyColor: products.bodyColor,
+      beamAngle: products.beamAngle,
+      powerConsumption: products.powerConsumption,
+      ipRating: products.ipRating,
+      colorTemperature: products.colorTemperature,
+      lumensOutput: products.lumensOutput,
+      material: products.material,
+      mountingType: products.mountingType,
+      controlType: products.controlType,
+      warrantyPeriod: products.warrantyPeriod,
+      certifications: products.certifications,
     }).from(products).where(eq(products.id, id));
     return product || undefined;
   }
