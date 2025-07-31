@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { PortfolioProject } from "@shared/schema";
 import QuoteModal from "@/components/QuoteModal";
 import CallUsButton from "@/components/CallUsButton";
+import ProjectDetailModal from "@/components/ProjectDetailModal";
 
 // Import fallback images
 import residentialLighting from "@/assets/residential-lighting.jpg";
@@ -17,6 +18,8 @@ import manufacturing from "@/assets/manufacturing.jpg";
 
 const Portfolio = () => {
   const [activeFilter, setActiveFilter] = useState("all");
+  const [selectedProject, setSelectedProject] = useState<PortfolioProject | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { 
     data: projects = [], 
@@ -28,12 +31,13 @@ const Portfolio = () => {
     retry: 3,
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    cacheTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (replaced cacheTime)
   });
 
   const getProjectImage = (project: PortfolioProject) => {
-    if (project.imageUrl) {
-      return project.imageUrl;
+    // Use first image from images array if available
+    if (project.images && project.images.length > 0) {
+      return project.images[0];
     }
 
     // Use fallback images based on category
@@ -55,7 +59,17 @@ const Portfolio = () => {
     return project.category.toLowerCase() === activeFilter.toLowerCase();
   });
 
-  const categories = ["all", ...Array.from(new Set(projects.map((p) => p.category)))];
+  const categories = ["all", ...Array.from(new Set(projects.map((p: PortfolioProject) => p.category)))];
+
+  const handleProjectClick = (project: PortfolioProject) => {
+    setSelectedProject(project);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedProject(null);
+  };
 
   // Error state
   if (error) {
@@ -171,8 +185,12 @@ const Portfolio = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProjects.map((project) => (
-              <Card key={project.id} className="group overflow-hidden hover:shadow-lg transition-all duration-300">
+            {filteredProjects.map((project: PortfolioProject) => (
+              <Card 
+                key={project.id} 
+                className="group overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
+                onClick={() => handleProjectClick(project)}
+              >
                 <div className="relative overflow-hidden">
                   <img
                     src={getProjectImage(project)}
@@ -212,7 +230,7 @@ const Portfolio = () => {
                   <div className="flex flex-wrap gap-2">
                     {project.features && project.features.length > 0 ? (
                       <>
-                        {project.features.slice(0, 3).map((feature, index) => (
+                        {project.features.slice(0, 3).map((feature: string, index: number) => (
                           <Badge key={index} variant="secondary" className="text-xs">
                             {feature}
                           </Badge>
@@ -228,6 +246,11 @@ const Portfolio = () => {
                         No features listed
                       </Badge>
                     )}
+                  </div>
+                  <div className="mt-4 pt-4 border-t">
+                    <Button variant="outline" size="sm" className="w-full">
+                      View Details
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -258,6 +281,13 @@ const Portfolio = () => {
           </div>
         </div>
       </div>
+
+      {/* Project Detail Modal */}
+      <ProjectDetailModal
+        project={selectedProject}
+        isOpen={isModalOpen}
+        onClose={closeModal}
+      />
     </div>
   );
 };

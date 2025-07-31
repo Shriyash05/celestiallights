@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star, X, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
-import type { PortfolioProject } from '@/lib/realtimeService';
+import type { PortfolioProject } from '@shared/schema';
 
 interface ProjectDetailModalProps {
   project: PortfolioProject | null;
@@ -18,8 +18,6 @@ const ProjectDetailModal = ({ project, isOpen, onClose }: ProjectDetailModalProp
 
   const allImages = project?.images && project.images.length > 0 
     ? project.images 
-    : project?.imageUrl 
-    ? [project.imageUrl] 
     : [];
 
   // Slideshow functionality
