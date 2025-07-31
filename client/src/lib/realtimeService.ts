@@ -36,6 +36,20 @@ export const useRealtimePortfolioProjects = () => {
 
     fetchProjects();
 
+    // Manual event listeners as fallback for real-time
+    const handleProjectAdded = (event: CustomEvent) => {
+      console.log('Manual project add event received:', event.detail);
+      setProjects((prev) => [event.detail, ...prev]);
+    };
+
+    const handleProjectDeleted = (event: CustomEvent) => {
+      console.log('Manual project delete event received:', event.detail);
+      setProjects((prev) => prev.filter((project) => project.id !== event.detail.id));
+    };
+
+    window.addEventListener('portfolioProjectAdded', handleProjectAdded as EventListener);
+    window.addEventListener('portfolioProjectDeleted', handleProjectDeleted as EventListener);
+
     // Subscribe to real-time changes
     const channel = supabase
       .channel('portfolio-projects-changes')
@@ -47,7 +61,9 @@ export const useRealtimePortfolioProjects = () => {
           table: 'portfolio_projects',
         },
         (payload) => {
-          setProjects((prev) => [(payload.new as any) as PortfolioProject, ...prev]); // Cast to any
+          console.log('Real-time INSERT received:', payload);
+          setProjects((prev) => [(payload.new as any) as PortfolioProject, ...prev]);
+          setLoading(false);
         }
       )
       .on(
@@ -58,6 +74,7 @@ export const useRealtimePortfolioProjects = () => {
           table: 'portfolio_projects',
         },
         (payload) => {
+          console.log('Real-time UPDATE received:', payload);
           setProjects((prev) =>
             prev.map((project) =>
               project.id === (payload.new as any).id ? ((payload.new as any) as PortfolioProject) : project
@@ -73,13 +90,18 @@ export const useRealtimePortfolioProjects = () => {
           table: 'portfolio_projects',
         },
         (payload) => {
-          setProjects((prev) => prev.filter((project) => project.id !== (payload.old as any).id)); // Cast to any
+          console.log('Real-time DELETE received:', payload);
+          setProjects((prev) => prev.filter((project) => project.id !== (payload.old as any).id));
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        console.log('Portfolio subscription status:', status, err);
+      });
 
     return () => {
       supabase.removeChannel(channel);
+      window.removeEventListener('portfolioProjectAdded', handleProjectAdded as EventListener);
+      window.removeEventListener('portfolioProjectDeleted', handleProjectDeleted as EventListener);
     };
   }, []);
 
@@ -115,6 +137,20 @@ export const useRealtimeProducts = () => {
 
     fetchProducts();
 
+    // Manual event listeners as fallback for real-time
+    const handleProductAdded = (event: CustomEvent) => {
+      console.log('Manual product add event received:', event.detail);
+      setProducts((prev) => [event.detail, ...prev]);
+    };
+
+    const handleProductDeleted = (event: CustomEvent) => {
+      console.log('Manual product delete event received:', event.detail);
+      setProducts((prev) => prev.filter((product) => product.id !== event.detail.id));
+    };
+
+    window.addEventListener('productAdded', handleProductAdded as EventListener);
+    window.addEventListener('productDeleted', handleProductDeleted as EventListener);
+
     // Subscribe to real-time changes
     const channel = supabase
       .channel('products-changes')
@@ -126,7 +162,9 @@ export const useRealtimeProducts = () => {
           table: 'products',
         },
         (payload) => {
-          setProducts((prev) => [(payload.new as any) as Product, ...prev]); // Cast to any
+          console.log('Real-time Product INSERT received:', payload);
+          setProducts((prev) => [(payload.new as any) as Product, ...prev]);
+          setLoading(false);
         }
       )
       .on(
@@ -137,6 +175,7 @@ export const useRealtimeProducts = () => {
           table: 'products',
         },
         (payload) => {
+          console.log('Real-time Product UPDATE received:', payload);
           setProducts((prev) =>
             prev.map((product) =>
               product.id === (payload.new as any).id ? ((payload.new as any) as Product) : product
@@ -152,13 +191,18 @@ export const useRealtimeProducts = () => {
           table: 'products',
         },
         (payload) => {
-          setProducts((prev) => prev.filter((product) => product.id !== (payload.old as any).id)); // Cast to any
+          console.log('Real-time Product DELETE received:', payload);
+          setProducts((prev) => prev.filter((product) => product.id !== (payload.old as any).id));
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        console.log('Products subscription status:', status, err);
+      });
 
     return () => {
       supabase.removeChannel(channel);
+      window.removeEventListener('productAdded', handleProductAdded as EventListener);
+      window.removeEventListener('productDeleted', handleProductDeleted as EventListener);
     };
   }, []);
 
@@ -170,12 +214,17 @@ export const addPortfolioProject = async (project: Omit<PortfolioProject, 'id' |
   const { data, error } = await supabase
     .from('portfolio_projects')
     .insert([{ ...project, id: crypto.randomUUID() }])
-    .select('*') // Select all fields to get complete project data including videos
+    .select('*')
     .single();
 
   if (error) {
     throw new Error(error.message);
   }
+
+  // Trigger a manual broadcast for immediate update if realtime is not working
+  setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('portfolioProjectAdded', { detail: data }));
+  }, 100);
 
   return data;
 };
@@ -207,6 +256,11 @@ export const deletePortfolioProject = async (id: string) => {
     throw new Error(error.message);
   }
 
+  // Trigger manual update
+  setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('portfolioProjectDeleted', { detail: { id } }));
+  }, 100);
+
   return true;
 };
 
@@ -215,12 +269,17 @@ export const addProduct = async (product: Omit<Product, 'id' | 'created_at' | 'u
   const { data, error } = await supabase
     .from('products')
     .insert([{ ...product, id: crypto.randomUUID() }])
-    .select('id') // Only select ID to bypass PostgREST schema cache issues
+    .select('*')
     .single();
 
   if (error) {
     throw new Error(error.message);
   }
+
+  // Trigger a manual broadcast for immediate update if realtime is not working
+  setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('productAdded', { detail: data }));
+  }, 100);
 
   return data;
 };
@@ -251,6 +310,11 @@ export const deleteProduct = async (id: string) => {
   if (error) {
     throw new Error(error.message);
   }
+
+  // Trigger manual update
+  setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('productDeleted', { detail: { id } }));
+  }, 100);
 
   return true;
 };
