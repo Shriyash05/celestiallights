@@ -36,3 +36,4 @@ export const isAdmin = async (user: any) => {
   
   return adminEmails.includes(user.email)
 }
+const API_BASE_URL = import.meta.env.DEV ? 'http://localhost:5000' : 'https://celestiallights.vercel.app';
