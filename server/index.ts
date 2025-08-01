@@ -40,8 +40,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve uploaded files statically
-app.use('/uploads', express.static('public/uploads'));
+// Files are now stored as base64 data URLs in the database - no local file serving needed
 
 (async () => {
   const server = await registerRoutes(app);

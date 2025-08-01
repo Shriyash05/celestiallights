@@ -1,27 +1,8 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 import { Request } from 'express';
 
-// Ensure upload directory exists
-const uploadDir = 'public/uploads';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-// Configure storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    // Store uploads in public/uploads directory
-    cb(null, 'public/uploads');
-  },
-  filename: (req, file, cb) => {
-    // Generate unique filename with timestamp
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
-});
+// Configure memory storage to store files in memory instead of disk
+const storage = multer.memoryStorage();
 
 // File filter for images, videos, and PDFs
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
@@ -43,7 +24,7 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilt
   }
 };
 
-// Configure multer
+// Configure multer to store files in memory
 export const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
@@ -54,3 +35,9 @@ export const upload = multer({
 
 // Middleware for multiple file uploads
 export const uploadMultiple = upload.array('files', 10); // Allow up to 10 files
+
+// Helper function to convert file buffer to base64 data URL
+export function bufferToDataURL(buffer: Buffer, mimetype: string): string {
+  const base64 = buffer.toString('base64');
+  return `data:${mimetype};base64,${base64}`;
+}

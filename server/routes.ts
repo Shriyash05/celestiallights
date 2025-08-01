@@ -3,26 +3,30 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertPortfolioProjectSchema, insertProductSchema, insertProfileSchema } from "@shared/schema";
 import { z } from "zod";
-import { uploadMultiple } from "./upload";
-import path from "path";
+import { uploadMultiple, bufferToDataURL } from "./upload";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // File Upload API
+  // File Upload API - now stores files as base64 data URLs in memory/database
   app.post("/api/upload", uploadMultiple, (req, res) => {
     try {
       if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
         return res.status(400).json({ error: "No files uploaded" });
       }
 
-      const fileUrls = req.files.map((file: Express.Multer.File) => ({
-        filename: file.filename,
-        originalName: file.originalname,
-        url: `/uploads/${file.filename}`,
-        size: file.size,
-        mimetype: file.mimetype,
-      }));
+      const fileData = req.files.map((file: Express.Multer.File) => {
+        // Convert file buffer to base64 data URL for database storage
+        const dataURL = bufferToDataURL(file.buffer, file.mimetype);
+        
+        return {
+          filename: file.originalname,
+          originalName: file.originalname,
+          url: dataURL, // Now contains the full base64 data URL
+          size: file.size,
+          mimetype: file.mimetype,
+        };
+      });
 
-      res.json({ files: fileUrls });
+      res.json({ files: fileData });
     } catch (error) {
       console.error("Error uploading files:", error);
       res.status(500).json({ error: "Failed to upload files" });

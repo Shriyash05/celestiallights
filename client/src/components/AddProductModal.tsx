@@ -187,7 +187,7 @@ const AddProductModal = ({ trigger }: AddProductModalProps) => {
       controlType,
       warrantyPeriod,
       certifications,
-      imageUrl: null, // Explicitly set to null as it's optional
+      imageUrl: null,
     });
   };
 

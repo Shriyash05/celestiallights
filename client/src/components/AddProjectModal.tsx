@@ -127,8 +127,7 @@ const AddProjectModal = ({ trigger }: AddProjectModalProps) => {
       videos,
       isPublished,
       isFeatured,
-      imageUrl: null, // Explicitly set to null as it's optional
-      videoUrl: null, // Explicitly set to null as it's optional
+      videoUrl: null,
     });
   };
 
