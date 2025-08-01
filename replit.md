@@ -60,10 +60,12 @@ A modern full-stack web application for Celestial Lights featuring:
 - Fixed video display in project detail modals
 - Implemented consistent image selection (no random photos)
 - Added manual event fallbacks for real-time updates
+- **RLS Issue**: Application working with base64 fallback due to RLS policies blocking anonymous access
 
 ## Deployment Notes
 - Configured for production deployment on GoDaddy
 - Uses Supabase PostgreSQL for database
 - Real-time subscriptions for instant UI updates
-- Static file serving configured for uploads
+- File uploads use Supabase Storage with base64 fallback
 - Cross-platform compatibility for hosting environments
+- **Action Required**: Set up RLS policies in Supabase dashboard (see SUPABASE_RLS_SETUP.md)
