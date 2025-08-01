@@ -3,29 +3,33 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertPortfolioProjectSchema, insertProductSchema, insertProfileSchema } from "@shared/schema";
 import { z } from "zod";
-import { uploadMultiple, bufferToDataURL } from "./upload";
+import { uploadMultiple, uploadToSupabaseStorage } from "./upload";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // File Upload API - now stores files as base64 data URLs in memory/database
-  app.post("/api/upload", uploadMultiple, (req, res) => {
+  // File Upload API - now stores files in Supabase Storage buckets
+  app.post("/api/upload", uploadMultiple, async (req, res) => {
     try {
       if (!req.files || !Array.isArray(req.files) || req.files.length === 0) {
         return res.status(400).json({ error: "No files uploaded" });
       }
 
-      const fileData = req.files.map((file: Express.Multer.File) => {
-        // Convert file buffer to base64 data URL for database storage
-        const dataURL = bufferToDataURL(file.buffer, file.mimetype);
-        
-        return {
-          filename: file.originalname,
-          originalName: file.originalname,
-          url: dataURL, // Now contains the full base64 data URL
-          size: file.size,
-          mimetype: file.mimetype,
-        };
+      const filePromises = req.files.map(async (file: Express.Multer.File) => {
+        try {
+          const publicUrl = await uploadToSupabaseStorage(file);
+          return {
+            filename: file.originalname,
+            originalName: file.originalname,
+            url: publicUrl, // Now contains the Supabase Storage public URL
+            size: file.size,
+            mimetype: file.mimetype,
+          };
+        } catch (error) {
+          console.error(`Failed to upload ${file.originalname}:`, error);
+          throw error;
+        }
       });
 
+      const fileData = await Promise.all(filePromises);
       res.json({ files: fileData });
     } catch (error) {
       console.error("Error uploading files:", error);

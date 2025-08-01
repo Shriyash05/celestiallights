@@ -210,7 +210,7 @@ export const useRealtimeProducts = () => {
 };
 
 // Function to add a new portfolio project
-export const addPortfolioProject = async (project: Omit<PortfolioProject, 'id' | 'created_at' | 'updated_at'>) => {
+export const addPortfolioProject = async (project: Omit<PortfolioProject, 'id' | 'createdAt' | 'updatedAt'>) => {
   const { data, error } = await supabase
     .from('portfolio_projects')
     .insert([{ ...project, id: crypto.randomUUID() }])
@@ -265,7 +265,7 @@ export const deletePortfolioProject = async (id: string) => {
 };
 
 // Function to add a new product
-export const addProduct = async (product: Omit<Product, 'id' | 'created_at' | 'updated_at'>) => {
+export const addProduct = async (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
   const { data, error } = await supabase
     .from('products')
     .insert([{ ...product, id: crypto.randomUUID() }])
