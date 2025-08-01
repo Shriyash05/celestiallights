@@ -117,7 +117,7 @@ const Admin = () => {
 
             <div className="grid gap-4">
               {projects.map((project: any) => (
-                <Card key={project.id} className="p-4">
+                <Card key={`project-${project.id}`} className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -190,7 +190,7 @@ const Admin = () => {
 
             <div className="grid gap-4">
               {products.map((product: any) => (
-                <Card key={product.id} className="p-4">
+                <Card key={`product-${product.id}`} className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">

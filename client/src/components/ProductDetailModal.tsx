@@ -82,13 +82,13 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
 
         <div className="space-y-6">
           {/* Image Slideshow */}
-          {allImages.length > 0 && (
+          {allImages.length > 0 ? (
             <div className="space-y-4">
               <div className="relative aspect-video bg-muted rounded-lg overflow-hidden group">
                 <div className="relative w-full h-full">
                   {allImages.map((image, index) => (
                     <div
-                      key={index}
+                      key={`image-${index}`}
                       className={`absolute inset-0 transition-all duration-500 ease-in-out ${
                         index === currentImageIndex 
                           ? 'opacity-100 scale-100' 
@@ -96,9 +96,13 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
                       }`}
                     >
                       <img
-                        src={image}
+                        src={String(image)}
                         alt={`${product.title} - Image ${index + 1}`}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.log('Image failed to load:', image);
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
                       />
                     </div>
                   ))}
@@ -165,7 +169,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
                       }`}
                     >
                       <img
-                        src={image}
+                        src={String(image)}
                         alt={`Thumbnail ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
@@ -173,6 +177,10 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
                   ))}
                 </div>
               )}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No images available for this product
             </div>
           )}
 
@@ -315,7 +323,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
                   <div className="flex flex-wrap gap-2">
                     {product.certifications.map((cert, index) => (
                       <Badge key={index} variant="secondary" className="px-3 py-1">
-                        {cert}
+                        {String(cert)}
                       </Badge>
                     ))}
                   </div>
@@ -330,7 +338,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
                     {(product.technicalSpecifications || []).map((spec, index) => (
                       <div key={index} className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
                         <div className="w-2 h-2 bg-primary rounded-full"></div>
-                        <span className="text-sm">{spec}</span>
+                        <span className="text-sm">{String(spec)}</span>
                       </div>
                     ))}
                   </div>
