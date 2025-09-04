@@ -5,7 +5,7 @@ import { CONTACT_CONFIG } from "@/config/contact";
 
 interface CallUsButtonProps {
   variant?: "default" | "outline" | "ghost" | "hero";
-  size?: "sm" | "md" | "lg";
+  size?: "default" | "sm" | "lg" | "icon";
   className?: string;
   children?: React.ReactNode;
   showIcon?: boolean;
@@ -13,7 +13,7 @@ interface CallUsButtonProps {
 
 const CallUsButton: React.FC<CallUsButtonProps> = ({ 
   variant = "default", 
-  size = "md", 
+  size = "default", 
   className = "",
   children = "Call Us",
   showIcon = true

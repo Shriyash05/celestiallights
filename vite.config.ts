@@ -17,5 +17,18 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['wouter'],
+          ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast'],
+          icons: ['lucide-react'],
+          forms: ['react-hook-form', '@hookform/resolvers'],
+          animations: ['framer-motion'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
   },
 });

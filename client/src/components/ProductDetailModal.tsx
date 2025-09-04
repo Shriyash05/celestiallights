@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, X, Zap, Play, Pause, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 import type { Product } from '@shared/schema';
 
 interface ProductDetailModalProps {

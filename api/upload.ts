@@ -1,6 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
-import formidable from 'formidable';
+import formidable, { File } from 'formidable';
 import fs from 'fs';
 
 // Initialize Supabase client for storage
@@ -17,7 +17,7 @@ if (supabaseKey) {
 }
 
 // Upload file to Supabase Storage
-async function uploadToSupabaseStorage(file: formidable.File): Promise<string> {
+async function uploadToSupabaseStorage(file: File): Promise<string> {
   if (!supabase) {
     // Fallback to base64 data URL if Supabase is not available
     console.warn('Supabase client not available, using base64 fallback');
@@ -90,7 +90,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const form = formidable({
       maxFileSize: 50 * 1024 * 1024, // 50MB limit
       multiples: true,
-      filter: ({ mimetype }) => {
+      filter: ({ mimetype }: { mimetype?: string | null }) => {
         // Allow images, videos, and PDFs
         return !!(mimetype && (
           mimetype.startsWith('image/') ||
@@ -106,7 +106,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: "No files uploaded" });
     }
 
-    const filePromises = files.files.map(async (file: formidable.File) => {
+    const filePromises = files.files.map(async (file: File) => {
       try {
         const publicUrl = await uploadToSupabaseStorage(file);
         return {
