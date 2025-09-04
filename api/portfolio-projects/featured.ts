@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../_lib/storage.js';
+import { portfolioStorage } from './storage-inline.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method } = req;
@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const projects = await storage.getFeaturedPortfolioProjects();
+    const projects = await portfolioStorage.getFeaturedPortfolioProjects();
     return res.status(200).json(projects);
   } catch (error) {
     console.error("Error fetching featured portfolio projects:", error);

@@ -126,6 +126,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.json({ files: fileData });
   } catch (error) {
     console.error("Error uploading files:", error);
+    
+    // Check if it's a file size error
+    if (error.toString().includes('maxFileSize exceeded')) {
+      return res.status(413).json({ 
+        error: "File too large", 
+        message: "File size exceeds 10MB limit. Please compress your video or use a smaller file.",
+        maxSize: "10MB"
+      });
+    }
+    
     res.status(500).json({ error: "Failed to upload files" });
   }
 }

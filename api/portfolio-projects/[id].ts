@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../_lib/storage.js';
+import { portfolioStorage } from './storage-inline.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query } = req;
@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     switch (method) {
       case 'GET':
-        const project = await storage.getPortfolioProject(id);
+        const project = await portfolioStorage.getPortfolioProject(id);
         if (!project) {
           return res.status(404).json({ error: "Project not found" });
         }
@@ -29,11 +29,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       case 'PATCH':
       case 'PUT':
-        const updatedProject = await storage.updatePortfolioProject(id, req.body);
+        const updatedProject = await portfolioStorage.updatePortfolioProject(id, req.body);
         return res.status(200).json(updatedProject);
 
       case 'DELETE':
-        await storage.deletePortfolioProject(id);
+        await portfolioStorage.deletePortfolioProject(id);
         return res.status(204).end();
 
       default:

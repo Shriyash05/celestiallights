@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../_lib/storage.js';
+import { authStorage } from './storage-inline.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method } = req;
@@ -25,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     
     // Check if profile exists and has admin role
-    const profile = await storage.getProfileByEmail(email);
+    const profile = await authStorage.getProfileByEmail(email);
     const isAdmin = profile?.role === "admin";
     
     res.json({ isAdmin });

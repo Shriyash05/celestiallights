@@ -58,5 +58,55 @@ export const portfolioStorage = {
       .values(insertProject)
       .returning({ id: portfolioProjects.id });
     return project;
+  },
+
+  async getFeaturedPortfolioProjects(): Promise<SelectedPortfolioProject[]> {
+    return await db.select({
+      id: portfolioProjects.id,
+      title: portfolioProjects.title,
+      category: portfolioProjects.category,
+      description: portfolioProjects.description,
+      features: portfolioProjects.features,
+      location: portfolioProjects.location,
+      isPublished: portfolioProjects.isPublished,
+      isFeatured: portfolioProjects.isFeatured,
+      createdAt: portfolioProjects.createdAt,
+      updatedAt: portfolioProjects.updatedAt,
+      videoUrl: portfolioProjects.videoUrl,
+      images: portfolioProjects.images,
+    }).from(portfolioProjects)
+      .where(eq(portfolioProjects.isFeatured, true))
+      .orderBy(portfolioProjects.createdAt);
+  },
+
+  async getPortfolioProject(id: string): Promise<SelectedPortfolioProject | undefined> {
+    const [project] = await db.select({
+      id: portfolioProjects.id,
+      title: portfolioProjects.title,
+      category: portfolioProjects.category,
+      description: portfolioProjects.description,
+      features: portfolioProjects.features,
+      location: portfolioProjects.location,
+      isPublished: portfolioProjects.isPublished,
+      isFeatured: portfolioProjects.isFeatured,
+      createdAt: portfolioProjects.createdAt,
+      updatedAt: portfolioProjects.updatedAt,
+      videoUrl: portfolioProjects.videoUrl,
+      images: portfolioProjects.images,
+    }).from(portfolioProjects).where(eq(portfolioProjects.id, id));
+    return project || undefined;
+  },
+
+  async updatePortfolioProject(id: string, updates: Partial<PortfolioProject>): Promise<{ id: string }> {
+    const [project] = await db
+      .update(portfolioProjects)
+      .set({ ...updates, updatedAt: sql`CURRENT_TIMESTAMP` })
+      .where(eq(portfolioProjects.id, id))
+      .returning({ id: portfolioProjects.id });
+    return project;
+  },
+
+  async deletePortfolioProject(id: string): Promise<void> {
+    await db.delete(portfolioProjects).where(eq(portfolioProjects.id, id));
   }
 };
