@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../_lib/storage.js';
+import { productStorage } from './storage-inline.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query } = req;
@@ -21,7 +21,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     switch (method) {
       case 'GET':
-        const product = await storage.getProduct(id);
+        const product = await productStorage.getProduct(id);
         if (!product) {
           return res.status(404).json({ error: "Product not found" });
         }
@@ -29,11 +29,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       case 'PATCH':
       case 'PUT':
-        const updatedProduct = await storage.updateProduct(id, req.body);
+        const updatedProduct = await productStorage.updateProduct(id, req.body);
         return res.status(200).json(updatedProduct);
 
       case 'DELETE':
-        await storage.deleteProduct(id);
+        await productStorage.deleteProduct(id);
         return res.status(204).end();
 
       default:

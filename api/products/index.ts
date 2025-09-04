@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../_lib/storage.js';
+import { productStorage } from './storage-inline.js';
 import { insertProductSchema } from '../../shared/schema.js';
 import { z } from 'zod';
 
@@ -18,13 +18,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     switch (method) {
       case 'GET':
-        const products = await storage.getPublishedProducts();
+        const products = await productStorage.getPublishedProducts();
         return res.status(200).json(products);
 
       case 'POST':
         try {
           const validatedData = insertProductSchema.parse(req.body);
-          const product = await storage.createProduct(validatedData);
+          const product = await productStorage.createProduct(validatedData);
           return res.status(201).json(product);
         } catch (error) {
           if (error instanceof z.ZodError) {

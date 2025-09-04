@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../_lib/storage.js';
+import { productStorage } from './storage-inline.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { method } = req;
@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const products = await storage.getFeaturedProducts();
+    const products = await productStorage.getFeaturedProducts();
     return res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching featured products:", error);

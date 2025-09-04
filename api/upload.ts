@@ -88,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const form = formidable({
-      maxFileSize: 50 * 1024 * 1024, // 50MB limit
+      maxFileSize: 10 * 1024 * 1024, // 10MB limit for Vercel compatibility
       multiples: true,
       filter: ({ mimetype }: { mimetype?: string | null }) => {
         // Allow images, videos, and PDFs
