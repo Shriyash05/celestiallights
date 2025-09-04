@@ -3,8 +3,8 @@ import {
   type Profile, type InsertProfile,
   type PortfolioProject, type InsertPortfolioProject,
   type Product, type InsertProduct
-} from "../../shared/schema";
-import { db } from "./db";
+} from "../../shared/schema.js";
+import { db } from "./db.js";
 import { eq, sql } from "drizzle-orm";
 
 // Define types for selected columns to match query results
