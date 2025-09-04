@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
-import { storage } from '../_lib/storage.js';
+import { portfolioStorage } from './storage-inline.js';
 import { insertPortfolioProjectSchema } from '../../shared/schema.js';
 import { z } from 'zod';
 
@@ -18,13 +18,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     switch (method) {
       case 'GET':
-        const projects = await storage.getPublishedPortfolioProjects();
+        const projects = await portfolioStorage.getPublishedPortfolioProjects();
         return res.status(200).json(projects);
 
       case 'POST':
         try {
           const validatedData = insertPortfolioProjectSchema.parse(req.body);
-          const project = await storage.createPortfolioProject(validatedData);
+          const project = await portfolioStorage.createPortfolioProject(validatedData);
           return res.status(201).json(project);
         } catch (error) {
           if (error instanceof z.ZodError) {
