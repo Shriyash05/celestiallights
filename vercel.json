@@ -8,6 +8,14 @@
   },
   "rewrites": [
     {
+      "source": "/api/portfolio-projects/([^/]+)",
+      "destination": "/api/portfolio-projects/id?id=$1"
+    },
+    {
+      "source": "/api/products/([^/]+)",
+      "destination": "/api/products/id?id=$1"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },
