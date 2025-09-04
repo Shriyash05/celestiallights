@@ -3,11 +3,8 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
-});
+// Users table - using Supabase auth, so we don't need a separate users table
+// The profiles table handles user data
 
 export const profiles = pgTable("profiles", {
   id: uuid("id").primaryKey(),
@@ -61,10 +58,6 @@ export const products = pgTable("products", {
 });
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
 
 export const insertProfileSchema = createInsertSchema(profiles).omit({
   createdAt: true,
@@ -84,8 +77,6 @@ export const insertProductSchema = createInsertSchema(products).omit({
 });
 
 // Types
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
 export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
 export type PortfolioProject = typeof portfolioProjects.$inferSelect;

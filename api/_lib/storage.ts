@@ -1,6 +1,6 @@
 import { 
-  users, profiles, portfolioProjects, products,
-  type User, type InsertUser, type Profile, type InsertProfile,
+  profiles, portfolioProjects, products,
+  type Profile, type InsertProfile,
   type PortfolioProject, type InsertPortfolioProject,
   type Product, type InsertProduct
 } from "../../shared/schema";
@@ -12,10 +12,6 @@ type SelectedPortfolioProject = Pick<PortfolioProject, 'id' | 'title' | 'categor
 type SelectedProduct = Pick<Product, 'id' | 'title' | 'category' | 'description' | 'isPublished' | 'isFeatured' | 'createdAt' | 'updatedAt' | 'imageUrl' | 'images' | 'technicalSpecifications' | 'dimensions' | 'bodyColor' | 'beamAngle' | 'powerConsumption' | 'ipRating' | 'colorTemperature' | 'lumensOutput' | 'material' | 'mountingType' | 'controlType' | 'warrantyPeriod' | 'certifications'>;
 
 export interface IStorage {
-  // User methods
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
   
   // Profile methods
   getProfile(id: string): Promise<Profile | undefined>;
@@ -43,24 +39,6 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  // User methods
-  async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
-    return user;
-  }
 
   // Profile methods
   async getProfile(id: string): Promise<Profile | undefined> {
