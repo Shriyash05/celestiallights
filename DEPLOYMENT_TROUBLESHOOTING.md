@@ -1,5 +1,43 @@
 # Vercel Deployment Troubleshooting Guide
 
+## ⚡ LATEST FIX: Function Runtime Error
+
+**Error:** `Function Runtimes must have a valid version, for example 'now-php@1.0.0'`
+
+**Solution:** The issue was with the `functions` configuration format. Use `builds` instead:
+
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.ts",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "buildCommand": "npm run build",
+        "outputDirectory": "client/dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}
+```
+
+---
+
 ## Common Deployment Failures and Solutions
 
 ### 1. Build Configuration Issues
