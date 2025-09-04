@@ -202,8 +202,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
               </h3>
               
               <div className="grid md:grid-cols-2 gap-6">
-                {/* Dimensions */}
-                {product.dimensions && typeof product.dimensions === 'object' && Object.keys(product.dimensions as Record<string, any>).length > 0 && (
+                {product.dimensions && typeof product.dimensions === 'object' && Object.keys(product.dimensions as Record<string, any>).length > 0 ? (
                   <div className="space-y-2">
                     <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">Dimensions</h4>
                     <div className="space-y-1">
@@ -233,7 +232,7 @@ const ProductDetailModal = ({ product, isOpen, onClose }: ProductDetailModalProp
                       )}
                     </div>
                   </div>
-                )}
+                ) : null}
 
                 {/* Physical Properties */}
                 <div className="space-y-2">
