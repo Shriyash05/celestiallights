@@ -18,7 +18,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     switch (method) {
       case 'GET':
-        const products = await productStorage.getPublishedProducts();
+        // Check if featured products are requested via query parameter
+        const featured = req.query.featured === 'true';
+        const products = featured 
+          ? await productStorage.getFeaturedProducts()
+          : await productStorage.getPublishedProducts();
         return res.status(200).json(products);
 
       case 'POST':

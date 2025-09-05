@@ -18,7 +18,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     switch (method) {
       case 'GET':
-        const projects = await portfolioStorage.getPublishedPortfolioProjects();
+        // Check if featured projects are requested via query parameter
+        const featured = req.query.featured === 'true';
+        const projects = featured 
+          ? await portfolioStorage.getFeaturedPortfolioProjects()
+          : await portfolioStorage.getPublishedPortfolioProjects();
         return res.status(200).json(projects);
 
       case 'POST':
