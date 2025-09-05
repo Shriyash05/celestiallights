@@ -88,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const form = formidable({
-      maxFileSize: 10 * 1024 * 1024, // 10MB limit for Vercel compatibility
+      maxFileSize: 25 * 1024 * 1024, // 25MB limit - increased for better video support
       multiples: true,
       filter: ({ mimetype }: { mimetype?: string | null }) => {
         // Allow images, videos, and PDFs
@@ -131,8 +131,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (error instanceof Error && error.toString().includes('maxFileSize exceeded')) {
       return res.status(413).json({ 
         error: "File too large", 
-        message: "File size exceeds 10MB limit. Please compress your video or use a smaller file.",
-        maxSize: "10MB"
+        message: "File size exceeds 25MB limit. For larger files, consider compressing your video or use the direct upload option.",
+        maxSize: "25MB",
+        suggestion: "Try using video compression tools or contact support for files larger than 25MB"
       });
     }
     
