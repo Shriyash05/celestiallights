@@ -4,21 +4,11 @@
   "functions": {
     "api/upload.ts": {
       "maxDuration": 60
-    },
-    "api/portfolio-projects/[id].ts": {
-      "runtime": "nodejs20.x"
-    },
-    "api/products/[id].ts": {
-      "runtime": "nodejs20.x"
     }
   },
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/(.*)",
+      "source": "/((?!api).*)",
       "destination": "/index.html"
     }
   ]
